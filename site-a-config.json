@@ -44,11 +44,6 @@
             "realNetwork": "192.168.1.0/24",
             "ipv6Enabled": true,
             "ipv6Prefix": "64:FF9B:1111::/96"
-          },
-          {
-            "virtualNetwork": "240.10.10.0/24",
-            "realNetwork": "10.10.10.0/24",
-            "ipv6Enabled": false
           }
         ],
         "rules": [
@@ -65,14 +60,8 @@
             "virtualDestination": "240.1.1.0/24",
             "realDestination": "192.168.1.0/24",
             "protocol": "udp"
-          },
-          {
-            "ruleId": "to-site-b-network-2",
-            "sourceSite": "site-b",
-            "virtualDestination": "240.10.10.0/24",
-            "realDestination": "10.10.10.0/24",
-            "protocol": "tcp,udp"
           }
+         
         ],
         "sessionTimeout": {
           "tcpTimeout": 300,
