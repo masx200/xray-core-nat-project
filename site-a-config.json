@@ -1,0 +1,145 @@
+{
+  "log": {
+    "loglevel": "info",
+    "access": "site-a-access.log"
+  },
+  "inbounds": [
+    {
+      "tag": "socks-inbound",
+      "port": 10808,
+      "listen": "0.0.0.0",
+      "protocol": "socks",
+      "settings": {
+        "auth": "noauth",
+        "udp": true
+      },
+      "sniffing": {
+        "enabled": true,
+        "destOverride": ["http", "tls"]
+      }
+    },
+    {
+      "tag": "http-inbound",
+      "port": 10809,
+      "listen": "0.0.0.0",
+      "protocol": "http",
+      "settings": {
+        "allowTransparent": false
+      },
+      "sniffing": {
+        "enabled": true,
+        "destOverride": ["http", "tls"]
+      }
+    }
+  ],
+  "outbounds": [
+    {
+      "tag": "nat-outbound",
+      "protocol": "nat",
+      "settings": {
+        "siteId": "site-a",
+        "virtualRanges": [
+          {
+            "virtualNetwork": "240.1.1.0/24",
+            "realNetwork": "192.168.1.0/24",
+            "ipv6Enabled": true,
+            "ipv6Prefix": "64:FF9B:1111::/96"
+          },
+          {
+            "virtualNetwork": "240.10.10.0/24",
+            "realNetwork": "10.10.10.0/24",
+            "ipv6Enabled": false
+          }
+        ],
+        "rules": [
+          {
+            "ruleId": "to-site-b-tcp",
+            "sourceSite": "site-b",
+            "virtualDestination": "240.1.1.0/24",
+            "realDestination": "192.168.1.0/24",
+            "protocol": "tcp"
+          },
+          {
+            "ruleId": "to-site-b-udp",
+            "sourceSite": "site-b",
+            "virtualDestination": "240.1.1.0/24",
+            "realDestination": "192.168.1.0/24",
+            "protocol": "udp"
+          },
+          {
+            "ruleId": "to-site-b-network-2",
+            "sourceSite": "site-b",
+            "virtualDestination": "240.10.10.0/24",
+            "realDestination": "10.10.10.0/24",
+            "protocol": "tcp,udp"
+          }
+        ],
+        "sessionTimeout": {
+          "tcpTimeout": 300,
+          "udpTimeout": 60,
+          "cleanupInterval": 30
+        },
+        "resourceLimits": {
+          "maxSessions": 5000,
+          "maxMemoryMB": 50,
+          "cleanupThreshold": 0.8
+        }
+      }
+    },
+    {
+      "tag": "direct",
+      "protocol": "freedom",
+      "settings": {
+        "domainStrategy": "UseIPv4"
+      }
+    },
+    {
+      "tag": "block",
+      "protocol": "blackhole",
+      "settings": {
+        "response": {
+          "type": "http"
+        }
+      }
+    }
+  ],
+  "routing": {
+    "domainStrategy": "IPOnDemand",
+    "rules": [
+      {
+        "type": "field",
+        "inboundTag": ["socks-inbound", "http-inbound"],
+        "domain": ["site-b.virtual", "site-b.ipv6.virtual"],
+        "outboundTag": "nat-outbound"
+      },
+      {
+        "type": "field",
+        "ip": ["240.2.2.0/24", "64:FF9B:2222::/96"],
+        "outboundTag": "nat-outbound"
+      },
+      {
+        "type": "field",
+        "ip": ["geoip:private"],
+        "outboundTag": "direct"
+      },
+      {
+        "type": "field",
+        "network": ["tcp", "udp"],
+        "outboundTag": "direct"
+      }
+    ]
+  },
+  "stats": {},
+  "policy": {
+    "system": {
+      "statsInboundUplink": true,
+      "statsInboundDownlink": true
+    },
+    "levels": {
+      "0": {
+        "statsUserUplink": true,
+        "statsUserDownlink": true
+      }
+    }
+  }
+}
