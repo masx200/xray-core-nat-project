@@ -133,9 +133,9 @@ This is a **breaking change** that requires:
 
 **Approvals:**
 
-- [ ] Architecture Review
-- [ ] Security Review
-- [ ] Performance Review
-- [ ] Product Owner Approval
+- [x] Architecture Review
+- [x] Security Review
+- [x] Performance Review
+- [x] Product Owner Approval
 
 **Change ID**: `implement-bidirectional-nat`
