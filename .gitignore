@@ -1,2 +1,4 @@
 .claude
 Xray-core-main/xray-test
+*.exe
+*.log
