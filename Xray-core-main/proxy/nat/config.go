@@ -1,6 +1,8 @@
 package nat
 
 import (
+	"google.golang.org/protobuf/proto"
+
 	"github.com/xtls/xray-core/common/protocol"
 )
 
@@ -33,4 +35,8 @@ func (c *Config) Equals(another protocol.Account) bool {
 	// For now, just check counts
 
 	return true
+}
+
+func (c *Config) ToProto() proto.Message {
+	return c // Return the config itself as proto message
 }

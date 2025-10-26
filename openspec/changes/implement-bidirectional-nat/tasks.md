@@ -4,47 +4,47 @@
 
 ### 1.1 Create NAT Proxy Handler Structure
 
-- [ ] Create `proxy/nat/` directory structure
-- [ ] Implement `nat.go` with basic handler structure
-- [ ] Add NAT handler to `main/distro/all/all.go` registration
-- [ ] Create `nat_test.go` with unit tests
+- [x] Create `proxy/nat/` directory structure
+- [x] Implement `nat.go` with basic handler structure
+- [x] Add NAT handler to `main/distro/all/all.go` registration
+- [x] Create `nat_test.go` with unit tests
 
 ### 1.2 Implement NAT Session Management
 
-- [ ] Design session data structure with key fields
-- [ ] Implement concurrent session table with thread-safe operations
-- [ ] Add session creation, lookup, and cleanup functions
+- [x] Design session data structure with key fields
+- [x] Implement concurrent session table with thread-safe operations
+- [x] Add session creation, lookup, and cleanup functions
 - [ ] Implement LRU eviction and memory limits
 
 ### 1.3 Implement DNAT Transformation Logic
 
-- [ ] Create destination address translation algorithm
-- [ ] Add port mapping support if specified
-- [ ] Implement IPv4 to IPv4 address mapping
-- [ ] Add IPv6 virtual to IPv4 real address mapping
+- [x] Create destination address translation algorithm
+- [x] Add port mapping support if specified
+- [x] Implement IPv4 to IPv4 address mapping
+- [x] Add IPv6 virtual to IPv4 real address mapping
 
 ### 1.4 Implement SNAT Transformation Logic
 
-- [ ] Create source address translation algorithm
-- [ ] Implement return traffic mapping
-- [ ] Add session-based SNAT for bidirectional flows
-- [ ] Handle TCP and UDP protocol differences
+- [x] Create source address translation algorithm
+- [x] Implement return traffic mapping
+- [x] Add session-based SNAT for bidirectional flows
+- [x] Handle TCP and UDP protocol differences
 
 ## Phase 2: Configuration and Protobuf (Week 2-3)
 
 ### 2.1 Define NAT Configuration Protobuf
 
-- [ ] Create `proxy/nat/config.proto` with NATConfig message
-- [ ] Add VirtualIPRange, NATRule, and supporting message types
-- [ ] Include SessionTimeout and ResourceLimits messages
-- [ ] Generate Go protobuf files
+- [x] Create `proxy/nat/config.proto` with NATConfig message
+- [x] Add VirtualIPRange, NATRule, and supporting message types
+- [x] Include SessionTimeout and ResourceLimits messages
+- [x] Generate Go protobuf files
 
 ### 2.2 Implement Configuration Parsing
 
-- [ ] Create `proxy/nat/config.go` with config parsing logic
-- [ ] Add validation for virtual IP ranges and rules
-- [ ] Implement default configuration values
-- [ ] Add error handling for invalid configurations
+- [x] Create `proxy/nat/config.go` with config parsing logic
+- [x] Add validation for virtual IP ranges and rules
+- [x] Implement default configuration values
+- [x] Add error handling for invalid configurations
 
 ### 2.3 Integrate with Core Configuration System
 

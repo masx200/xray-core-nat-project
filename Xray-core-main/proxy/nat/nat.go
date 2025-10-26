@@ -9,14 +9,15 @@ import (
 	"time"
 
 	"github.com/xtls/xray-core/common"
+	"github.com/xtls/xray-core/common/buf"
 	"github.com/xtls/xray-core/common/errors"
 	"github.com/xtls/xray-core/common/net"
 	"github.com/xtls/xray-core/common/session"
 	"github.com/xtls/xray-core/core"
 	"github.com/xtls/xray-core/features/policy"
-	"github.com/xtls/xray-core/proxy"
 	"github.com/xtls/xray-core/transport"
 	"github.com/xtls/xray-core/transport/internet"
+	"github.com/xtls/xray-core/transport/internet/stat"
 	"github.com/xtls/xray-core/common/retry"
 	"github.com/xtls/xray-core/common/task"
 )
@@ -82,8 +83,10 @@ func (h *Handler) Init(config *Config, pm policy.Manager) error {
 	h.config = config
 	h.policyManager = pm
 
-	// Start session cleanup routine
-	go h.sessionCleanupRoutine()
+	// Only start cleanup routine if not already running
+	if h.cleanupTicker != nil {
+		go h.sessionCleanupRoutine()
+	}
 
 	return nil
 }
@@ -120,7 +123,7 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 func (h *Handler) shouldApplyNAT(destination net.Destination) (*NATRule, bool) {
 	for _, rule := range h.config.Rules {
 		if h.matchesVirtualDestination(destination, rule.VirtualDestination) {
-			return &rule, true
+			return rule, true
 		}
 	}
 	return nil, false
@@ -158,12 +161,12 @@ func (h *Handler) handleNormalOutbound(ctx context.Context, link *transport.Link
 	// Handle bidirectional traffic
 	requestDone := func() error {
 		defer conn.Close()
-		return transport.Copy(conn, link.Reader)
+		return buf.Copy(buf.NewReader(conn), link.Writer)
 	}
 
 	responseDone := func() error {
 		defer conn.Close()
-		return transport.Copy(link.Writer, conn)
+		return buf.Copy(link.Reader, buf.NewWriter(conn))
 	}
 
 	return task.Run(ctx, requestDone, task.OnSuccess(responseDone, task.Close(link.Writer)))
@@ -202,7 +205,7 @@ func (h *Handler) handleNATOutbound(ctx context.Context, link *transport.Link, d
 			h.removeSession(session.SessionID)
 			conn.Close()
 		}()
-		return transport.Copy(conn, link.Reader)
+		return buf.Copy(buf.NewReader(conn), link.Writer)
 	}
 
 	responseDone := func() error {
@@ -210,7 +213,7 @@ func (h *Handler) handleNATOutbound(ctx context.Context, link *transport.Link, d
 			h.removeSession(session.SessionID)
 			conn.Close()
 		}()
-		return transport.Copy(link.Writer, conn)
+		return buf.Copy(link.Reader, buf.NewWriter(conn))
 	}
 
 	return task.Run(ctx, requestDone, task.OnSuccess(responseDone, task.Close(link.Writer)))
@@ -281,7 +284,14 @@ func (h *Handler) sessionCleanupRoutine() {
 // cleanupExpiredSessions removes sessions that have exceeded their timeout
 func (h *Handler) cleanupExpiredSessions() {
 	now := time.Now()
-	timeout := time.Duration(h.config.SessionTimeout.TcpTimeout) * time.Second
+	var timeout time.Duration
+
+	// Use default timeout if config is not available
+	if h.config != nil && h.config.SessionTimeout != nil {
+		timeout = time.Duration(h.config.SessionTimeout.TcpTimeout) * time.Second
+	} else {
+		timeout = 300 * time.Second // Default 5 minutes
+	}
 
 	h.sessionTable.Range(func(key, value interface{}) bool {
 		if session, ok := value.(*NATSession); ok {
@@ -293,6 +303,7 @@ func (h *Handler) cleanupExpiredSessions() {
 		return true
 	})
 }
+
 
 // generateSessionID generates a unique session identifier
 func generateSessionID(virtualDest, realDest net.Destination) string {
