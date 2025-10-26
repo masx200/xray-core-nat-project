@@ -232,25 +232,50 @@ func (h *Handler) matchesIPv6EmbeddedIPv4(destination xnet.Destination, virtualN
 func (h *Handler) matchesIPv6EmbeddedIPv4Range(destination xnet.Destination, ipv6Prefix, realNetwork string) bool {
 	destStr := destination.Address.String()
 
-	// First check if the IPv6 prefix matches (strip the CIDR part for comparison)
-	prefixWithoutCIDR := ipv6Prefix
-	if strings.Contains(ipv6Prefix, "/") {
-		parts := strings.Split(ipv6Prefix, "/")
-		prefixWithoutCIDR = parts[0]
+	// Normalize IPv6 address by removing brackets if present
+	normalizedDest := destStr
+	if strings.HasPrefix(destStr, "[") && strings.HasSuffix(destStr, "]") {
+		normalizedDest = strings.Trim(destStr, "[]")
 	}
 
-	// Check if the destination address starts with the expected IPv6 prefix
-	// Handle both compressed and uncompressed formats
-	if !strings.HasPrefix(strings.ToLower(destStr), strings.ToLower(prefixWithoutCIDR)) {
-		// For compressed format, check if the address contains the prefix
-		if !strings.Contains(strings.ToLower(destStr), strings.ToLower(prefixWithoutCIDR)) {
+	// Parse IPv6 prefix using net package
+	_, ipv6Net, err := net.ParseCIDR(ipv6Prefix)
+	if err != nil {
+		// If CIDR parsing fails, fall back to string matching
+		prefixWithoutCIDR := ipv6Prefix
+		if strings.Contains(ipv6Prefix, "/") {
+			parts := strings.Split(ipv6Prefix, "/")
+			prefixWithoutCIDR = parts[0]
+		}
+
+		// Check if the normalized destination address starts with the expected IPv6 prefix
+		if !strings.HasPrefix(strings.ToLower(normalizedDest), strings.ToLower(prefixWithoutCIDR)) {
+			// For compressed format, check if the address contains the prefix
+			if !strings.Contains(strings.ToLower(normalizedDest), strings.ToLower(prefixWithoutCIDR)) {
+				return false
+			}
+		}
+	} else {
+		// Use proper CIDR matching
+		destIP := net.ParseIP(normalizedDest)
+		if destIP == nil {
+			return false
+		}
+		if !ipv6Net.Contains(destIP) {
 			return false
 		}
 	}
 
-	// Handle both compressed and uncompressed IPv6 formats
-	if strings.Contains(destStr, ":") {
-		extractedIPv4 := h.extractIPv4FromIPv6(destStr)
+	// Extract IPv4 from the normalized destination address
+	if strings.Contains(normalizedDest, ":") && strings.Contains(normalizedDest, ".") {
+		extractedIPv4 := h.extractIPv4FromIPv6(normalizedDest)
+		if extractedIPv4 != "" {
+			// Check if extracted IPv4 is in the real network range
+			return h.matchesCIDR(extractedIPv4, realNetwork)
+		}
+	} else if strings.Contains(normalizedDest, ":") {
+		// Handle compressed IPv6 format (hex notation)
+		extractedIPv4 := h.extractIPv4FromIPv6(normalizedDest)
 		if extractedIPv4 != "" {
 			// Check if extracted IPv4 is in the real network range
 			return h.matchesCIDR(extractedIPv4, realNetwork)
