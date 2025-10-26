@@ -263,12 +263,8 @@ func TestIPv6EmbeddedIPv4NAT(t *testing.T) {
 		},
 	}
 
-	handler := &Handler{
-		config:        config,
-		sessionTable:  &sync.Map{},
-		cleanupTicker: time.NewTicker(30 * time.Second),
-		done:          make(chan struct{}),
-	}
+	handler := New()
+	handler.config = config
 
 	// Test IPv6 embedded IPv4 addresses
 	testCases := []struct {
@@ -365,12 +361,8 @@ func TestIPv6EmbeddedIPv4NAT_NewPrefix(t *testing.T) {
 		},
 	}
 
-	handler := &Handler{
-		config:        config,
-		sessionTable:  &sync.Map{},
-		cleanupTicker: time.NewTicker(30 * time.Second),
-		done:          make(chan struct{}),
-	}
+	handler := New()
+	handler.config = config
 
 	// Test IPv6 embedded IPv4 addresses with new prefix
 	testCases := []struct {
