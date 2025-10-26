@@ -4,7 +4,7 @@ package xray.proxy.nat;
 
 option go_package = "github.com/xtls/xray-core/proxy/nat";
 
-import "common/protoext/extensions.proto";
+// import "common/protoext/extensions.proto";
 
 message Config {
   // Site identifier for this NAT gateway
