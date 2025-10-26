@@ -1,0 +1,95 @@
+syntax = "proto3";
+
+package xray.proxy.nat;
+
+option go_package = "github.com/xtls/xray-core/proxy/nat";
+
+import "common/protoext/extensions.proto";
+
+message Config {
+  // Site identifier for this NAT gateway
+  string site_id = 1;
+
+  // User level for policy management
+  uint32 user_level = 2;
+
+  // Protocol enablement
+  bool enable_tcp = 3;
+  bool enable_udp = 4;
+
+  // Virtual IP ranges managed by this gateway
+  repeated VirtualIPRange virtual_ranges = 5;
+
+  // Translation rules for destination networks
+  repeated NATRule rules = 6;
+
+  // Session timeout configuration
+  SessionTimeout session_timeout = 7;
+
+  // Performance and memory limits
+  ResourceLimits limits = 8;
+}
+
+message VirtualIPRange {
+  // Virtual IP range (e.g., "240.2.2.0/24")
+  string virtual_network = 1;
+
+  // Corresponding real network (e.g., "192.168.1.0/24")
+  string real_network = 2;
+
+  // IPv6 support
+  bool ipv6_enabled = 3;
+
+  // IPv6 virtual prefix
+  string ipv6_virtual_prefix = 4;
+}
+
+message NATRule {
+  // Rule identifier
+  string rule_id = 1;
+
+  // Source site filter (optional)
+  string source_site = 2;
+
+  // Virtual IP destination to match
+  string virtual_destination = 3;
+
+  // Real destination to translate to
+  string real_destination = 4;
+
+  // Protocol filtering (tcp, udp, or both)
+  string protocol = 5;
+
+  // Port mapping (optional)
+  PortMapping port_mapping = 6;
+}
+
+message PortMapping {
+  // Original port or range
+  string original_port = 1;
+
+  // Translated port or range
+  string translated_port = 2;
+}
+
+message SessionTimeout {
+  // TCP connection timeout in seconds
+  uint32 tcp_timeout = 1;
+
+  // UDP session timeout in seconds
+  uint32 udp_timeout = 2;
+
+  // Idle session cleanup interval in seconds
+  uint32 cleanup_interval = 3;
+}
+
+message ResourceLimits {
+  // Maximum concurrent sessions
+  uint32 max_sessions = 1;
+
+  // Maximum memory usage in MB
+  uint32 max_memory_mb = 2;
+
+  // Session table cleanup threshold
+  float cleanup_threshold = 3;
+}
