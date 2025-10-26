@@ -1,0 +1,95 @@
+# Документация по сборке
+
+## Подготовка
+
+Xray использует [Golang](https://golang.org/) в качестве языка программирования, поэтому вам необходимо сначала установить последнюю версию Golang, чтобы иметь возможность выполнить сборку.
+
+::: tip СОВЕТ
+Установка Golang: [golang.org/doc/install](https://golang.org/doc/install)
+:::
+
+> Если вы, к сожалению, используете Windows, **обязательно** используйте Powershell.
+
+## Получение исходного кода Xray
+
+```bash
+git clone https://github.com/XTLS/Xray-core.git
+cd Xray-core && go mod download
+```
+
+> Если вам нечем заняться, можете попробовать официальный инструмент GitHub: `gh repo clone XTLS/Xray-core`.
+
+Примечание: в сетевых средах, где нет доступа к Google, зависимости не могут быть получены обычным способом, поэтому необходимо сначала установить `GOPROXY`:
+
+```bash
+go env -w GOPROXY=https://goproxy.io,direct
+```
+
+## Сборка бинарного файла
+
+:::warning
+Команды в этом разделе необходимо выполнять в корневом каталоге Xray.
+:::
+
+### Windows (Powershell):
+
+```powershell
+$env:CGO_ENABLED=0
+go build -o xray.exe -trimpath -buildvcs=false -ldflags "-s -w -buildid=" ./main
+```
+
+### macOS, Linux:
+
+```bash
+CGO_ENABLED=0 go build -o xray -trimpath -buildvcs=false -ldflags "-s -w -buildid=" ./main
+```
+
+Выполнение этих команд создаст исполняемый файл xray в текущем каталоге.
+
+::: tip
+Если вам нужно собрать программу с поддержкой отладки, то есть такую, к которой можно подключиться с помощью dlv для отладки, удалите опции '-w -s' из ldflags.
+
+-w отключает генерацию отладочной информации. Если эта опция используется, отладка с помощью gdb будет невозможна.
+-s отключает таблицу символов.
+P.S.: На самом деле отладка с помощью vscode или другой IDE может быть более удобной.
+:::
+
+## Кросс-компиляция:
+
+В качестве примера рассмотрим компиляцию в среде Windows (Powershell) для сервера Linux:
+
+```powershell
+$env:CGO_ENABLED=0
+$env:GOOS="linux"
+$env:GOARCH="amd64"
+
+go build -o xray -trimpath -buildvcs=false -ldflags "-s -w -buildid=" ./main
+```
+
+После загрузки на сервер не забудьте выполнить команду `chmod +x xray` в терминале сервера.
+
+::: tip
+Выполните команду `go tool dist list`, чтобы просмотреть все поддерживаемые системы и архитектуры.
+:::
+
+## Воспроизводимая сборка:
+
+Используйте следующие команды для сборки (`<short commit ID>` следует заменить на соответствующие первые семь символов SHA-256 коммита):
+
+```bash
+CGO_ENABLED=0 go build -o xray -trimpath -buildvcs=false -gcflags="all=-l=4" -ldflags="-X github.com/xtls/xray-core/core.build=<short commit ID> -s -w -buildid=" -v ./main
+```
+
+Для архитектур MIPS/MIPSLE следует использовать:
+
+```bash
+CGO_ENABLED=0 go build -o xray -trimpath -buildvcs=false -gcflags="-l=4" -ldflags="-X github.com/xtls/xray-core/core.build=<short commit ID> -s -w -buildid=" -v ./main
+```
+
+::: warning
+Пожалуйста, сначала убедитесь, что версия Golang, которую вы используете, соответствует версии, использованной для компиляции релизов.
+:::
+
+## Компиляция версии для Windows 7
+
+Замените инструментарий Golang на версию, предоставленную в [go-win7](https://github.com/XTLS/go-win7), а затем выполните компиляцию, следуя шагам выше.
