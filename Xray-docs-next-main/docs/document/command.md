@@ -1,8 +1,6 @@
 # 命令参数
 
-::: tip
-Xray 使用 Go 风格的命令及参数
-:::
+::: tip Xray 使用 Go 风格的命令及参数 :::
 
 ## 获取基本命令
 
@@ -39,7 +37,7 @@ Use "xray help <command>" for more information about a command.
 使用方法:
 
 ```
- xray run [-c config.json] [-confdir dir]
+xray run [-c config.json] [-confdir dir]
 ```
 
 ```
@@ -59,24 +57,20 @@ without launching the server.
 The -dump flag tells Xray to print the merged config.
 ```
 
-`-config=` / `-c=` 用于指定使用的配置文件的位置，支持多文件配置。
-`-confdir=` 用于指定一个包含多个配置文件的文件夹。
-`-format=` 用于指定使用的配置文件的格式。
-`-test` 用于测试配置文件的合法性。
-`-dump` 用于显示多文件配置文件合并之后的效果。
-::: tip
-配置文件除了默认的 JSON 格式外，也可以使用 TOML 和 YAML。在不指定格式的前提下会通过文件扩展名识别。
-:::
+`-config=` / `-c=` 用于指定使用的配置文件的位置，支持多文件配置。 `-confdir=`
+用于指定一个包含多个配置文件的文件夹。 `-format=` 用于指定使用的配置文件的格式。
+`-test` 用于测试配置文件的合法性。 `-dump`
+用于显示多文件配置文件合并之后的效果。 ::: tip 配置文件除了默认的 JSON
+格式外，也可以使用 TOML 和 YAML。在不指定格式的前提下会通过文件扩展名识别。 :::
 
-::: tip
-当 `-config` 没有指定时，Xray 将先后尝试从以下路径加载 `config.json` :
+::: tip 当 `-config` 没有指定时，Xray 将先后尝试从以下路径加载 `config.json` :
 
 - 工作目录（Working Directory）
-- [环境变量](../config/features/env.md#资源文件路径)中 `Xray.location.asset` 所指定的路径
-  :::
+- [环境变量](../config/features/env.md#资源文件路径)中 `Xray.location.asset`
+  所指定的路径 :::
 
 ```
- xray run -dump
+xray run -dump
 ```
 
 用以输出多文件配置融合之后的结果。
@@ -88,7 +82,7 @@ The -dump flag tells Xray to print the merged config.
 使用方法:
 
 ```
- xray version
+xray version
 ```
 
 ### xray api
@@ -102,14 +96,14 @@ xray api <command> [arguments]
 ```
 
 ```
-        restartlogger Restart the logger
-        stats         Get statistics
-        statsquery    Query statistics
-        statssys      Get system statistics
-        adi           Add inbounds
-        ado           Add outbounds
-        rmi           Remove inbounds
-        rmo           Remove outbounds
+restartlogger Restart the logger
+stats         Get statistics
+statsquery    Query statistics
+statssys      Get system statistics
+adi           Add inbounds
+ado           Add outbounds
+rmi           Remove inbounds
+rmo           Remove outbounds
 ```
 
 ### xray convert
@@ -178,9 +172,9 @@ xray tls <command> [arguments]
 ```
 
 ```
-        cert          Generate TLS certificates
-        ping          Ping the domain with TLS handshake
-        certChainHash Calculate TLS certificates hash.
+cert          Generate TLS certificates
+ping          Ping the domain with TLS handshake
+certChainHash Calculate TLS certificates hash.
 ```
 
 ### xray uuid
@@ -213,12 +207,11 @@ xray x25519 [-i "(base64.RawURLEncoding)" --std-encoding ]
 xray wg [-i "(base64.StdEncoding)"]
 ```
 
-::: tip
-当 `-config` 没有指定时，Xray 将先后尝试从以下路径加载 `config.json` :
+::: tip 当 `-config` 没有指定时，Xray 将先后尝试从以下路径加载 `config.json` :
 
 - 工作目录（Working Directory）
-- [环境变量](../config/features/env.md#资源文件路径)中 `Xray.location.asset` 所指定的路径
-  :::
+- [环境变量](../config/features/env.md#资源文件路径)中 `Xray.location.asset`
+  所指定的路径 :::
 
 ### xray mldsa65
 
@@ -242,7 +235,9 @@ xray mlkem768 [-i "seed (base64.StdEncoding)"]
 
 ### xray vlessenc
 
-生成可以直接用于 VLESS Encryption 的 encryption/decryption 选项内容。生成配置中 X25519 以及 ML-KEM-768 两种认证方式选一种使用即可，但是服务端及客户端必须采用同一种认证方式。临时密钥交换仍后量子安全，不受认证方式影响。
+生成可以直接用于 VLESS Encryption 的 encryption/decryption 选项内容。生成配置中
+X25519 以及 ML-KEM-768
+两种认证方式选一种使用即可，但是服务端及客户端必须采用同一种认证方式。临时密钥交换仍后量子安全，不受认证方式影响。
 
 使用方法:
 

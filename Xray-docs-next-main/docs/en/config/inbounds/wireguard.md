@@ -2,9 +2,9 @@
 
 User-space implementation of the Wireguard protocol.
 
-::: danger
-**The Wireguard protocol is not specifically designed for circumvention purposes. If used as the outer layer for circumvention, its characteristics may lead to server blocking.**
-:::
+::: danger **The Wireguard protocol is not specifically designed for
+circumvention purposes. If used as the outer layer for circumvention, its
+characteristics may lead to server blocking.** :::
 
 ## InboundConfigurationObject
 
@@ -45,7 +45,10 @@ The structure of a Wireguard packet is as follows:
 - 16-byte authentication tag
 ```
 
-`N-byte encrypted data` is the MTU value we need. Depending on whether the endpoint is IPv4 or IPv6, the specific values can be 1440 (IPv4) or 1420 (IPv6). If in a special environment, subtract additional bytes accordingly (e.g., subtract 8 more bytes for PPPoE over home broadband).
+`N-byte encrypted data` is the MTU value we need. Depending on whether the
+endpoint is IPv4 or IPv6, the specific values can be 1440 (IPv4) or 1420 (IPv6).
+If in a special environment, subtract additional bytes accordingly (e.g.,
+subtract 8 more bytes for PPPoE over home broadband).
 
 </details>
 

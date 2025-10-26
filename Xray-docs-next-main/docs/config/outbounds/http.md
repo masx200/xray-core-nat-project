@@ -2,13 +2,10 @@
 
 HTTP 协议。
 
-::: danger
-**http 协议没有对传输加密，不适宜经公网中传输，更容易成为被人用作攻击的肉鸡。**
-:::
+::: danger **http
+协议没有对传输加密，不适宜经公网中传输，更容易成为被人用作攻击的肉鸡。** :::
 
-::: tip
-`http` 只能代理 tcp 协议，udp 系的协议均不能通过。
-:::
+::: tip `http` 只能代理 tcp 协议，udp 系的协议均不能通过。 :::
 
 ## OutboundConfigurationObject
 
@@ -27,9 +24,8 @@ HTTP 协议。
 }
 ```
 
-::: tip
-目前 HTTP 协议 outbound 中 `streamSettings` 设置 `security` 和 `tlsSettings` 是生效的。
-:::
+::: tip 目前 HTTP 协议 outbound 中 `streamSettings` 设置 `security` 和
+`tlsSettings` 是生效的。 :::
 
 > `address`: string
 
@@ -49,9 +45,11 @@ HTTP 代理服务器端口，必填。
 
 > `level`: number
 
-用户等级，连接会使用这个用户等级对应的 [本地策略](../policy.md#levelpolicyobject)。如果对接服务端需要认证则选填，否则不要包含此项。
+用户等级，连接会使用这个用户等级对应的
+[本地策略](../policy.md#levelpolicyobject)。如果对接服务端需要认证则选填，否则不要包含此项。
 
-userLevel 的值, 对应 [policy](../policy.md#policyobject) 中 `level` 的值。 如不指定, 默认为 0。
+userLevel 的值, 对应 [policy](../policy.md#policyobject) 中 `level` 的值。
+如不指定, 默认为 0。
 
 > `email`: string
 

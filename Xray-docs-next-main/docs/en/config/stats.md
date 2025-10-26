@@ -12,9 +12,11 @@ The `StatsObject` corresponds to the `stats` item in the configuration file.
 }
 ```
 
-Currently, no parameters are required for traffic statistics, and internal statistics will be enabled as long as the `StatsObject` item exists.
+Currently, no parameters are required for traffic statistics, and internal
+statistics will be enabled as long as the `StatsObject` item exists.
 
-After statistics are enabled, you only need to enable the corresponding items in the [Policy](./policy.md) to collect the corresponding data.
+After statistics are enabled, you only need to enable the corresponding items in
+the [Policy](./policy.md) to collect the corresponding data.
 
 ## Retrieving Traffic Statistics
 
@@ -31,9 +33,8 @@ The current traffic statistics are as follows:
 
     The downlink traffic of a specific user, in bytes.
 
-::: tip
-If the corresponding user does not have an email specified, statistics will not be enabled.
-:::
+::: tip If the corresponding user does not have an email specified, statistics
+will not be enabled. :::
 
 - Global Data
   - `inbound>>>[tag]>>>traffic>>>uplink`

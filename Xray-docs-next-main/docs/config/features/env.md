@@ -5,10 +5,12 @@ Xray 提供以下环境变量以供修改 Xray 的一些底层配置。
 ## 资源文件路径
 
 - 名称：`xray.location.asset` 或 `XRAY_LOCATION_ASSET`。
-- 默认值：特定 [FHS](https://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard) 目录或 Xray 文件同路径。
+- 默认值：特定
+  [FHS](https://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard) 目录或 Xray
+  文件同路径。
 
-这个环境变量指定了一个文件夹位置，这个文件夹应当包含 geoip.dat 和 geosite.dat 文件。
-若无指定变量值，程序将会按以下顺序寻找资源文件：
+这个环境变量指定了一个文件夹位置，这个文件夹应当包含 geoip.dat 和 geosite.dat
+文件。 若无指定变量值，程序将会按以下顺序寻找资源文件：
 
 ```
 ./
@@ -48,4 +50,4 @@ Xray 提供以下环境变量以供修改 Xray 的一些底层配置。
 - xray.xudp.show
 - xray.xudp.basekey
 
-这些选项对有特殊需求的用户开放，您可以阅读源代码来发现其用途。~PR Welcome~
+这些选项对有特殊需求的用户开放，您可以阅读源代码来发现其用途。~~PR Welcome~~

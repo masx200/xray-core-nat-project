@@ -39,9 +39,11 @@ footer: Licensed under CC-BY-SA 4.0 | Copyright 2020-Present Project X Community
 
 ## XTLS ? Xray ? V2Ray ?
 
-**XTLS are brilliant ideas for TLS we study, while Xray is the best practice we maintain.**
+**XTLS are brilliant ideas for TLS we study, while Xray is the best practice we
+maintain.**
 
-- Xray-core 是 v2ray-core 的超集，含更好的整体性能和 XTLS 等一系列增强，且~~完全~~兼容 v2ray-core 的功能及配置。
+- Xray-core 是 v2ray-core 的超集，含更好的整体性能和 XTLS
+  等一系列增强，且~~完全~~兼容 v2ray-core 的功能及配置。
   - 只有一个可执行文件，含 ctl 的功能，run 为默认指令
   - 配置上~~完全~~兼容，环境变量和 API 对应要改为以 XRAY\_ 开头
   - 全平台开放了裸协议的 ReadV
@@ -52,15 +54,19 @@ footer: Licensed under CC-BY-SA 4.0 | Copyright 2020-Present Project X Community
 
 ### 我们是谁？
 
-> **It doesn't matter who we are. What matters is that we will keep riding and never look back.**
+> **It doesn't matter who we are. What matters is that we will keep riding and
+> never look back.**
 
 ### 帮助 Xray 变得更强
 
 欢迎帮助 Xray 变得更强！
 
 - 🖥️ 帮助开发和测试 Xray, 提交高质量的 Pull request.
-- 📩 在 [GitHub Issues](https://github.com/XTLS/Xray-core/issues) 或 [讨论区](https://github.com/XTLS/Xray-core/discussions)发起建设性或有意义的 issue 与 discussion.
-- 📝 写下您的使用心得并提交至 Xray 的 [文档网站](https://github.com/XTLS/Xray-docs-next).
+- 📩 在 [GitHub Issues](https://github.com/XTLS/Xray-core/issues) 或
+  [讨论区](https://github.com/XTLS/Xray-core/discussions)发起建设性或有意义的
+  issue 与 discussion.
+- 📝 写下您的使用心得并提交至 Xray 的
+  [文档网站](https://github.com/XTLS/Xray-docs-next).
 - 💬 在 Telegram 群帮助群友/灌水.
 - **...事实上,每一份对 Xray 的支持都会让 Xray 变得更强大**
 
@@ -89,7 +95,8 @@ footer: Licensed under CC-BY-SA 4.0 | Copyright 2020-Present Project X Community
 ### 更多关于 Project X
 
 - 如果你想知道更多关于 Project X 的足迹与成长, 请点击[这里](./about/news.md)
-- 现在 Project X 也发行 NFT 了！如果想拥有一枚 Project X NFT 或者想捐赠或者赞助 Project X，请点击[这里](https://github.com/XTLS/Xray-core/discussions/3633)
+- 现在 Project X 也发行 NFT 了！如果想拥有一枚 Project X NFT 或者想捐赠或者赞助
+  Project X，请点击[这里](https://github.com/XTLS/Xray-core/discussions/3633)
 
 ### License
 

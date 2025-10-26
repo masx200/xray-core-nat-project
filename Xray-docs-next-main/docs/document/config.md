@@ -2,16 +2,15 @@
 
 [下载并安装](./install) 了 Xray 之后，您需要对它进行一下配置。
 
-为了演示，这里只介绍简单的配置方式。更多的模板: [Xray-examples](https://github.com/XTLS/Xray-examples)
+为了演示，这里只介绍简单的配置方式。更多的模板:
+[Xray-examples](https://github.com/XTLS/Xray-examples)
 
 如需配置更复杂的功能，请参考更详细的 [配置文件](../config/) 中相关说明。
 
-::: danger
-为了避免你的流量被解密，<br>
-你应该使用 `xray uuid` 或 `uuidgen` 生成一个独一无二的uuid <br>
-在服务端上，放入 `inbounds[0].settings.clients[0].id` 内 <br>
-在客户端内，放入 `outbounds[0].settings.vnext[0].users[0].id` 内 <br>
-:::
+::: danger 为了避免你的流量被解密，<br> 你应该使用 `xray uuid` 或 `uuidgen`
+生成一个独一无二的uuid <br> 在服务端上，放入
+`inbounds[0].settings.clients[0].id` 内 <br> 在客户端内，放入
+`outbounds[0].settings.vnext[0].users[0].id` 内 <br> :::
 
 ## 服务端配置
 
@@ -93,7 +92,8 @@
 }
 ```
 
-上述配置唯一要更改的地方是你的服务器 IP 和用户 uuid，配置中已注明。上述配置会把除局域网（比如访问路由器）和国内IP段（比如访问bilibili、acfun）以外的所有流量转发至你的服务器。
+上述配置唯一要更改的地方是你的服务器 IP 和用户
+uuid，配置中已注明。上述配置会把除局域网（比如访问路由器）和国内IP段（比如访问bilibili、acfun）以外的所有流量转发至你的服务器。
 
 ## 运行
 

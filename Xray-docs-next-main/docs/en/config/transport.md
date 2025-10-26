@@ -2,11 +2,16 @@
 
 Transports specify how Xray communicates with peers.
 
-Transports specify how to achieve stable data transmission. Both ends of a connection often need to specify the same transport protocol to successfully establish a connection. Like, if one end uses WebSocket, the other end must also use WebSocket, or else the connection cannot be established.
+Transports specify how to achieve stable data transmission. Both ends of a
+connection often need to specify the same transport protocol to successfully
+establish a connection. Like, if one end uses WebSocket, the other end must also
+use WebSocket, or else the connection cannot be established.
 
 ## StreamSettingsObject
 
-`StreamSettingsObject` corresponds to the `streamSettings` property in the inbound or outbound config. Each inbound or outbound can be configured with different transports and can use `streamSettings` to specify local configs.
+`StreamSettingsObject` corresponds to the `streamSettings` property in the
+inbound or outbound config. Each inbound or outbound can be configured with
+different transports and can use `streamSettings` to specify local configs.
 
 ```json
 {
@@ -44,10 +49,12 @@ Transports specify how to achieve stable data transmission. Both ends of a conne
 
 > `network`: "raw" | "xhttp" | "kcp" | "grpc" | "ws" | "httpupgrade"
 
-The underlying protocol of the transport used by the data stream of the connection, defaulting to `"raw"`.
+The underlying protocol of the transport used by the data stream of the
+connection, defaulting to `"raw"`.
 
-::: tip
-After v24.9.30, the TCP transport has been renamed to RAW to more closely match actual behavior. `"network": "raw"` and `"network": "tcp"`, `rawSettings` and `tcpSettings` are aliases for each other for compatibility.
+::: tip After v24.9.30, the TCP transport has been renamed to RAW to more
+closely match actual behavior. `"network": "raw"` and `"network": "tcp"`,
+`rawSettings` and `tcpSettings` are aliases for each other for compatibility.
 :::
 
 > `security`: "none" | "tls" | "reality"
@@ -55,44 +62,56 @@ After v24.9.30, the TCP transport has been renamed to RAW to more closely match 
 Whether to enable transport layer encryption. Supported options below.
 
 - `"none"` enables no encryption (default).
-- `"tls"` enables encryption with [TLS](https://en.wikipedia.org/wiki/transport_Layer_Security).
+- `"tls"` enables encryption with
+  [TLS](https://en.wikipedia.org/wiki/transport_Layer_Security).
 - `"reality"` enables encryption with REALITY.
 
 > `tlsSettings`: [TLSObject](#tlsobject)
 
-Configures vanilla TLS. The TLS encryption suite is provided by Golang, which often uses TLS 1.3, and has no support for DTLS.
+Configures vanilla TLS. The TLS encryption suite is provided by Golang, which
+often uses TLS 1.3, and has no support for DTLS.
 
 > `realitySettings`: [RealityObject](#realityobject)
 
-Configures REALITY. REALITY is a piece of advanced encryption technology developed in-house, with higher security than vanilla TLS, but configs of both are largely the same.
+Configures REALITY. REALITY is a piece of advanced encryption technology
+developed in-house, with higher security than vanilla TLS, but configs of both
+are largely the same.
 
-::: tip
-REALITY is by far the most secure transport encryption solution, perfectly mimicking normal web browsing when observed. Enabling REALITY with appropriate XTLS Vision flow control schemes has the potential of reaching magnitudes of performance boosts.
-:::
+::: tip REALITY is by far the most secure transport encryption solution,
+perfectly mimicking normal web browsing when observed. Enabling REALITY with
+appropriate XTLS Vision flow control schemes has the potential of reaching
+magnitudes of performance boosts. :::
 
 > `rawSettings`: [RawObject](./transports/raw.md)
 
-Configures the current RAW connection. Valid only when RAW is used. Same schema as global.
+Configures the current RAW connection. Valid only when RAW is used. Same schema
+as global.
 
-> `xhttpSettings`: [XHTTP: Beyond REALITY](https://github.com/XTLS/Xray-core/discussions/4113)
+> `xhttpSettings`:
+> [XHTTP: Beyond REALITY](https://github.com/XTLS/Xray-core/discussions/4113)
 
-Configures XHTTP connections. Valid only when XHTTP is used. Same schema as global.
+Configures XHTTP connections. Valid only when XHTTP is used. Same schema as
+global.
 
 > `kcpSettings`: [KcpObject](./transports/mkcp.md)
 
-Configures the current mKCP connection. Valid only when mKCP is used. Same schema as global.
+Configures the current mKCP connection. Valid only when mKCP is used. Same
+schema as global.
 
 > `grpcSettings`: [GRPCObject](./transports/grpc.md)
 
-Configures the current gRPC connection. Valid only when gRPC is used. Same schema as global.
+Configures the current gRPC connection. Valid only when gRPC is used. Same
+schema as global.
 
 > `wsSettings`: [WebSocketObject](./transports/websocket.md)
 
-Configures the current WebSocket connection. Valid only when WebSocket is used. Same schema as global.
+Configures the current WebSocket connection. Valid only when WebSocket is used.
+Same schema as global.
 
 > `httpupgradeSettings`: [HttpUpgradeObject](./transports/httpupgrade.md)
 
-Configures the current HTTPUpgrade connection. Valid only when HTTPUpgrade is used. Same schema as global.
+Configures the current HTTPUpgrade connection. Valid only when HTTPUpgrade is
+used. Same schema as global.
 
 > `sockopt`: [SockoptObject](#sockoptobject)
 
@@ -104,7 +123,7 @@ Configures transparent proxies.
 {
   "serverName": "xray.com",
   "rejectUnknownSni": false,
-  "verifyPeerCertInNames": ["xray.com"]
+  "verifyPeerCertInNames": ["xray.com"],
   "allowInsecure": false,
   "alpn": ["h2", "http/1.1"],
   "minVersion": "1.2",
@@ -121,23 +140,31 @@ Configures transparent proxies.
 
 > `serverName`: string
 
-Specifies the domain of the server-side certificate, useful when connecting only via IP addresses.
+Specifies the domain of the server-side certificate, useful when connecting only
+via IP addresses.
 
-When the target is specified by domains, like when the domain is received by SOCKS inbounds or detected via sniffing, the extracted domain will automatically be used as `serverName`, without any need for manual configuration.
+When the target is specified by domains, like when the domain is received by
+SOCKS inbounds or detected via sniffing, the extracted domain will automatically
+be used as `serverName`, without any need for manual configuration.
 
 > `rejectUnknownSni`: bool
 
-When `true`, the server rejects TLS handshakes if the SNI received does not match domains specified in the certificate. The default value is `false`.
+When `true`, the server rejects TLS handshakes if the SNI received does not
+match domains specified in the certificate. The default value is `false`.
 
 > `verifyPeerCertInNames`: [string]
 
-only client, used to verify the SNI used by the certificate, The certificate is verified if and only if it is verified for one of the domains in this list, the default is [serverName].
-for using MitM+domainFronting there is special case "fromMitM", if the list contain "fromMitM" the domain and all subdomain of the real sni(initial sni before change) automatically added to the list.
+only client, used to verify the SNI used by the certificate, The certificate is
+verified if and only if it is verified for one of the domains in this list, the
+default is [serverName]. for using MitM+domainFronting there is special case
+"fromMitM", if the list contain "fromMitM" the domain and all subdomain of the
+real sni(initial sni before change) automatically added to the list.
 
 > `alpn`: [ string ]
 
-An array of strings specifying the ALPN values used in TLS handshakes. Defaults to `["h2", "http/1.1"]`.
-for using MitM+domainFronting, there is special case ["fromMitM"], and this is selected alpn of initial tls request termination.
+An array of strings specifying the ALPN values used in TLS handshakes. Defaults
+to `["h2", "http/1.1"]`. for using MitM+domainFronting, there is special case
+["fromMitM"], and this is selected alpn of initial tls request termination.
 (also, when using `h2c` dns, this is equal to domain of the URL)
 
 > `minVersion`: [ string ]
@@ -150,39 +177,53 @@ for using MitM+domainFronting, there is special case ["fromMitM"], and this is s
 
 > `cipherSuites`: [ string ]
 
-`CipherSuites` specifies a list of supported cryptographic suites, with names of each separated by a colon.
+`CipherSuites` specifies a list of supported cryptographic suites, with names of
+each separated by a colon.
 
-You can find the names and descriptions of encryption suites in Go [here](https://golang.org/src/crypto/tls/cipher_suites.go#L500) or [here](https://golang.org/src/crypto/tls/cipher_suites.go#L44).
+You can find the names and descriptions of encryption suites in Go
+[here](https://golang.org/src/crypto/tls/cipher_suites.go#L500) or
+[here](https://golang.org/src/crypto/tls/cipher_suites.go#L44).
 
-::: danger
-The above two configs are optional and do not have impact on security under normal circumstances. When not configured, Go will select the parameters automatically on a per-device basis. If you are not familiar with these configs, leave them as is, or you will bear consequences of potential problems caused by your improper configuration.
-:::
+::: danger The above two configs are optional and do not have impact on security
+under normal circumstances. When not configured, Go will select the parameters
+automatically on a per-device basis. If you are not familiar with these configs,
+leave them as is, or you will bear consequences of potential problems caused by
+your improper configuration. :::
 
 > `allowInsecure`: true | false
 
 Whether to allow insecure connections (client-only). Defaults to `false`.
 
-When `true`, Xray will not verify the validity of the TLS certificate provided by the outbound.
+When `true`, Xray will not verify the validity of the TLS certificate provided
+by the outbound.
 
-::: danger
-This should not be set to `true` in deployments for security reaons, or it can be susceptible to man-in-the-middle attacks.
-:::
+::: danger This should not be set to `true` in deployments for security reaons,
+or it can be susceptible to man-in-the-middle attacks. :::
 
 > `disableSystemRoot`: true | false
 
-Whether to disable the CA certificates provided by the operating system. Defaults to `false`.
+Whether to disable the CA certificates provided by the operating system.
+Defaults to `false`.
 
-When `true`, Xray will only use the certificates specified in `certificates` for TLS handshakes. When `false`, Xray will only use the CA certificates provided by the operating system for TLS handshakes.
+When `true`, Xray will only use the certificates specified in `certificates` for
+TLS handshakes. When `false`, Xray will only use the CA certificates provided by
+the operating system for TLS handshakes.
 
 > `enableSessionResumption`: true | false
 
-When `false`, the `session_ticket` extension will not be included in ClientHello. Oftentimes the ClientHello in Go programs does not have this extension enabled, so it is recommended to leave it as-is. Defaults to `false`.
+When `false`, the `session_ticket` extension will not be included in
+ClientHello. Oftentimes the ClientHello in Go programs does not have this
+extension enabled, so it is recommended to leave it as-is. Defaults to `false`.
 
 > `fingerprint`: string
 
-Specifies the fingerprint of the `TLS Client Hello` message. When empty, fingerprint simulation will not be enabled. When enabled, Xray will **simulate** the `TLS` fingerprint through the uTLS library or have it generated randomly. Three types of options are supported:
+Specifies the fingerprint of the `TLS Client Hello` message. When empty,
+fingerprint simulation will not be enabled. When enabled, Xray will **simulate**
+the `TLS` fingerprint through the uTLS library or have it generated randomly.
+Three types of options are supported:
 
-1. Simulate TLS fingerprints of the latest versions of popular browsers, including:
+1. Simulate TLS fingerprints of the latest versions of popular browsers,
+   including:
 
 - `"chrome"`
 - `"firefox"`
@@ -196,45 +237,58 @@ Specifies the fingerprint of the `TLS Client Hello` message. When empty, fingerp
 1. Have a fingerprint generated automatically when xray starts
 
 - `"random"`: randomly select one of the up-to-date browsers
-- `"randomized"`: generate a completely random and unique fingerprint (100% compatible with TLS 1.3 using X25519)
+- `"randomized"`: generate a completely random and unique fingerprint (100%
+  compatible with TLS 1.3 using X25519)
 
-1. Use uTLS native fingerprint variable names, such as `"HelloRandomizedNoALPN"` `"HelloChrome_106_Shuffle"`. See the full list in the [uTLS library](https://github.com/refraction-networking/utls/blob/master/u_common.go#L162).
+1. Use uTLS native fingerprint variable names, such as `"HelloRandomizedNoALPN"`
+   `"HelloChrome_106_Shuffle"`. See the full list in the
+   [uTLS library](https://github.com/refraction-networking/utls/blob/master/u_common.go#L162).
 
-::: tip
-This feature only **simulates** the fingerprint of `TLS Client Hello` message, leaving other behaviours the same as vanilla Go TLS. If you want to simulate a browser `TLS` more completely, use the [Browser Dialer](./transports/websocket.md#browser-dialer).
-:::
+::: tip This feature only **simulates** the fingerprint of `TLS Client Hello`
+message, leaving other behaviours the same as vanilla Go TLS. If you want to
+simulate a browser `TLS` more completely, use the
+[Browser Dialer](./transports/websocket.md#browser-dialer). :::
 
-::: tip
-When using this feature, some TLS options that affect the TLS fingerprint will be overridden by the utls library and will no longer be effective, such as ALPN.
-The parameters that will be passed are
+::: tip When using this feature, some TLS options that affect the TLS
+fingerprint will be overridden by the utls library and will no longer be
+effective, such as ALPN. The parameters that will be passed are
 `"serverName" "allowInsecure" "disableSystemRoot" "pinnedPeerCertificateChainSha256" "masterKeyLog"`
 :::
 
 > `pinnedPeerCertificateChainSha256`: [string]
 
-Specifies the SHA256 hash values of the certificate chain of the remote server, using the standard encoding format. Only when the hash value of the server-side certificate chain matches any of the specified can a TLS connection be successfully established.
+Specifies the SHA256 hash values of the certificate chain of the remote server,
+using the standard encoding format. Only when the hash value of the server-side
+certificate chain matches any of the specified can a TLS connection be
+successfully established.
 
-When the connection fails with this active, the hash value of the remote certificate will be shown.
+When the connection fails with this active, the hash value of the remote
+certificate will be shown.
 
-::: danger
-It is not recommended to use this method to obtain the hash value of the certificate chain, because in this case, there will be no opportunity to verify whether the certificate provided by the server at this time is a real certificate, and it cannot be guaranteed that the obtained certificate hash value is the expected hash value.
-:::
+::: danger It is not recommended to use this method to obtain the hash value of
+the certificate chain, because in this case, there will be no opportunity to
+verify whether the certificate provided by the server at this time is a real
+certificate, and it cannot be guaranteed that the obtained certificate hash
+value is the expected hash value. :::
 
-::: tip
-If you need to obtain the hash value of the certificate, run `xray tls certChainHash --cert <cert.pem>` in the command line, where `<cert.pem>` is replaced by the actual certificate file path.
-:::
+::: tip If you need to obtain the hash value of the certificate, run
+`xray tls certChainHash --cert <cert.pem>` in the command line, where
+`<cert.pem>` is replaced by the actual certificate file path. :::
 
 > `certificates`: [ [CertificateObject](#certificateobject) ]
 
-A list of certificates, each representing a single certificate (fullchain recommended).
+A list of certificates, each representing a single certificate (fullchain
+recommended).
 
-::: tip
-If you want to achieve A/A+ rating in SSLLabs or MySSL tests, visit [here](https://github.com/XTLS/Xray-core/discussions/56#discussioncomment-215600) for further information.
-:::
+::: tip If you want to achieve A/A+ rating in SSLLabs or MySSL tests, visit
+[here](https://github.com/XTLS/Xray-core/discussions/56#discussioncomment-215600)
+for further information. :::
 
 > `masterKeyLog`: string
 
-Path to the (Pre-)Master-Secret log file. Can be used by sniffers like WireShark to decrypt TLS connections managed by Xray. Cannot be used with uTLS at the moment, and requires Xray-core v.8.7 or later.
+Path to the (Pre-)Master-Secret log file. Can be used by sniffers like WireShark
+to decrypt TLS connections managed by Xray. Cannot be used with uTLS at the
+moment, and requires Xray-core v.8.7 or later.
 
 #### RealityObject
 
@@ -257,25 +311,24 @@ Path to the (Pre-)Master-Secret log file. Can be used by sniffers like WireShark
 }
 ```
 
-::: tip
-Further information available in the [REALITY project repo](https://github.com/XTLS/REALITY).
-:::
+::: tip Further information available in the
+[REALITY project repo](https://github.com/XTLS/REALITY). :::
 
 > `show`: true | false
 
 Emits verbose logs when `true`.
 
-::: tip
-**Inbound** (**server-side**) configs below.
-:::
+::: tip **Inbound** (**server-side**) configs below. :::
 
 > `dest`: string
 
-Required. Same schema as [dest](./features/fallback.md#fallbackobject) in VLESS `fallbacks`.
+Required. Same schema as [dest](./features/fallback.md#fallbackobject) in VLESS
+`fallbacks`.
 
 > `xver`: string
 
-Optional. Same schema as [xver](./features/fallback.md#fallbackobject) in VLESS `fallbacks`.
+Optional. Same schema as [xver](./features/fallback.md#fallbackobject) in VLESS
+`fallbacks`.
 
 > `serverNames`: [string]
 
@@ -299,15 +352,15 @@ Optional. The maximum time difference allowed, specified in milliseconds.
 
 > `shortIds`: [string]
 
-Required. A list of `shortId`s accepted. Can be used to distinguish different clients.
+Required. A list of `shortId`s accepted. Can be used to distinguish different
+clients.
 
-Specified in hex strings, with the length as multiples of 2. Cannot be longer than 16 characters.
+Specified in hex strings, with the length as multiples of 2. Cannot be longer
+than 16 characters.
 
 `shortId` on clients can be left blank if a blank value exists on the server.
 
-::: tip
-**Outbound** (**client-side**) configs below.
-:::
+::: tip **Outbound** (**client-side**) configs below. :::
 
 > `serverName`: string
 
@@ -321,17 +374,20 @@ Required. Same as the [TLSObject](#tlsobject).
 
 One of the short IDs accepted by the server.
 
-Specified in hex strings, with the length as multiples of 2. Cannot be longer than 16 characters.
+Specified in hex strings, with the length as multiples of 2. Cannot be longer
+than 16 characters.
 
 `shortId` on clients can be left blank if a blank value exists on the server.
 
 > `publicKey`: string
 
-Required. The public key that corresponds to the private key on the server. Can be obtained by `./xray x25519 -i "privateKey"`.
+Required. The public key that corresponds to the private key on the server. Can
+be obtained by `./xray x25519 -i "privateKey"`.
 
 > `spiderX`: string
 
-The bootstrapping path and query params of the spider. It's recommended to have this varied per client.
+The bootstrapping path and query params of the spider. It's recommended to have
+this varied per client.
 
 #### CertificateObject
 
@@ -396,55 +452,58 @@ The bootstrapping path and query params of the spider. It's recommended to have 
 
 > `ocspStapling`: number
 
-OCSP stapling update interval in seconds for certificate hot reload. Default value is `3600`, i.e. one hour.
+OCSP stapling update interval in seconds for certificate hot reload. Default
+value is `3600`, i.e. one hour.
 
 > `oneTimeLoading`: true | false
 
-Load only once. When set to `true`, it will disable certificate hot reload and OCSP stapling feature.
+Load only once. When set to `true`, it will disable certificate hot reload and
+OCSP stapling feature.
 
-::: warning
-When set to `true`, OCSP stapling will be disabled.
-:::
+::: warning When set to `true`, OCSP stapling will be disabled. :::
 
 > `usage`: "encipherment" | "verify" | "issue"
 
 Certificate usage, default value is `"encipherment"`.
 
-- `"encipherment"`: The certificate is used for TLS authentication and encryption.
-- `"verify"`: The certificate is used to verify the remote TLS certificate. When using this option, the current certificate must be a CA certificate.
-- `"issue"`: The certificate is used to issue other certificates. When using this option, the current certificate must be a CA certificate.
+- `"encipherment"`: The certificate is used for TLS authentication and
+  encryption.
+- `"verify"`: The certificate is used to verify the remote TLS certificate. When
+  using this option, the current certificate must be a CA certificate.
+- `"issue"`: The certificate is used to issue other certificates. When using
+  this option, the current certificate must be a CA certificate.
 
-::: tip TIP 1
-On Windows platform, self-signed CA certificate can be installed in the system for verifying remote TLS certificates.
-:::
+::: tip TIP 1 On Windows platform, self-signed CA certificate can be installed
+in the system for verifying remote TLS certificates. :::
 
-::: tip TIP 2
-When a new client request comes in, assuming the specified `serverName` is `"xray.com"`, Xray will first look for a certificate that can be used for `"xray.com"` in the certificate list. If not found, it will issue a certificate for `"xray.com"` using any certificate with `usage` set to `"issue"`, with a validity of one hour. The new certificate is then added to the certificate list for later use.
-:::
+::: tip TIP 2 When a new client request comes in, assuming the specified
+`serverName` is `"xray.com"`, Xray will first look for a certificate that can be
+used for `"xray.com"` in the certificate list. If not found, it will issue a
+certificate for `"xray.com"` using any certificate with `usage` set to
+`"issue"`, with a validity of one hour. The new certificate is then added to the
+certificate list for later use. :::
 
-::: tip TIP 3
-When both `certificateFile` and `certificate` are specified, Xray will use `certificateFile` as the priority. The same applies to `keyFile` and `key`.
-:::
+::: tip TIP 3 When both `certificateFile` and `certificate` are specified, Xray
+will use `certificateFile` as the priority. The same applies to `keyFile` and
+`key`. :::
 
-::: tip TIP 4
-When `usage` is set to `"verify"`, `keyFile` and `key` can both be empty.
-:::
+::: tip TIP 4 When `usage` is set to `"verify"`, `keyFile` and `key` can both be
+empty. :::
 
-::: tip TIP 5
-Use `xray tls cert` to generate self-signed CA certificate.
-:::
+::: tip TIP 5 Use `xray tls cert` to generate self-signed CA certificate. :::
 
-::: tip TIP 6
-If you already have a domain name, you can use tools to obtain free third-party certificates easily, such as [acme.sh](https://github.com/acmesh-official/acme.sh).
-:::
+::: tip TIP 6 If you already have a domain name, you can use tools to obtain
+free third-party certificates easily, such as
+[acme.sh](https://github.com/acmesh-official/acme.sh). :::
 
 > `buildChain`: true | false
 
-Only valid when `usage` is `issue`. When set to `true`, the CA certificate will be appended to leaf certificate as chain during issuing certificates.
+Only valid when `usage` is `issue`. When set to `true`, the CA certificate will
+be appended to leaf certificate as chain during issuing certificates.
 
-::: tip TIP 1
-Root certificates should not be embedded in the certificate chain. This option is only applicable when the signing CA certificate is an intermediate certificate.
-:::
+::: tip TIP 1 Root certificates should not be embedded in the certificate chain.
+This option is only applicable when the signing CA certificate is an
+intermediate certificate. :::
 
 > `certificateFile`: string
 
@@ -452,15 +511,18 @@ Path to the certificate file generated by OpenSSL, with the suffix `.crt`.
 
 > `certificate`: [ string ]
 
-A string array representing the certificate content, in the format shown in the example. Either `certificate` or `certificateFile` can be used.
+A string array representing the certificate content, in the format shown in the
+example. Either `certificate` or `certificateFile` can be used.
 
 > `keyFile`: string
 
-Path to the key file generated by OpenSSL, with the suffix `.key`. Password-protected key files are not currently supported.
+Path to the key file generated by OpenSSL, with the suffix `.key`.
+Password-protected key files are not currently supported.
 
 > `key`: [ string ]
 
-A string array representing the key content, in the format shown in the example. Either `key` or `keyFile` can be used.
+A string array representing the key content, in the format shown in the example.
+Either `key` or `keyFile` can be used.
 
 ### SockoptObject
 
@@ -483,55 +545,92 @@ A string array representing the key content, in the format shown in the example.
 
 > `mark`: number
 
-An integer value. When its value is non-zero, SO_MARK is marked with this value on the outbound connection.
+An integer value. When its value is non-zero, SO_MARK is marked with this value
+on the outbound connection.
 
 - Only applicable to Linux systems.
 - Requires CAP_NET_ADMIN permission.
 
 > `tcpFastOpen`: true | false | number
 
-Specifies whether [TCP Fast Open](https://en.wikipedia.org/wiki/TCP_Fast_Open) is enabled.
+Specifies whether [TCP Fast Open](https://en.wikipedia.org/wiki/TCP_Fast_Open)
+is enabled.
 
-When its value is `true` or a positive integer, TFO is enabled; when its value is `false` or a negative integer, TFO is forced to be disabled; when this item does not exist or is `0`, the system default setting is used. It can be used for inbound/outbound connections.
+When its value is `true` or a positive integer, TFO is enabled; when its value
+is `false` or a negative integer, TFO is forced to be disabled; when this item
+does not exist or is `0`, the system default setting is used. It can be used for
+inbound/outbound connections.
 
 - Only available in the following (or later) versions of operating systems:
   - Windows 10 (1607)
   - Mac OS 10.11 / iOS 9
-  - Linux 3.16: It needs to be set through the kernel parameter `net.ipv4.tcp_fastopen`, which is a bitmap. `0x1` represents the client allows enabling it, and `0x2` represents the server allows enabling it. The default value is `0x1`. If the server wants to enable TFO, set this kernel parameter value to `0x3`.
-  - FreeBSD 10.3 (Server) / 12.0 (Client): The kernel parameters `net.inet.tcp.fastopen.server_enabled` and `net.inet.tcp.fastopen.client_enabled` need to be set to `1`.
-- For inbound, the `positive integer` set here represents the maximum number of TFO connection requests to be processed, **note that not all operating systems support this setting**:
-  - Linux/FreeBSD: The `positive integer` value set here represents the upper limit, and the maximum acceptable value is 2147483647. If it is set to `true`, it will take `256`. Note that in Linux, `net.core.somaxconn` will limit the upper limit of this value. If it exceeds `somaxconn`, please also increase `somaxconn`.
-  - Mac OS: When it is `true` or a `positive integer`, it only represents enabling TFO, and the upper limit needs to be set separately through the kernel parameter `net.inet.tcp.fastopen_backlog`.
-  - Windows: When it is `true` or a `positive integer`, it only represents enabling TFO.
-- For outbound, setting it to `true` or a `positive integer` only represents enabling TFO on any operating system.
+  - Linux 3.16: It needs to be set through the kernel parameter
+    `net.ipv4.tcp_fastopen`, which is a bitmap. `0x1` represents the client
+    allows enabling it, and `0x2` represents the server allows enabling it. The
+    default value is `0x1`. If the server wants to enable TFO, set this kernel
+    parameter value to `0x3`.
+  - FreeBSD 10.3 (Server) / 12.0 (Client): The kernel parameters
+    `net.inet.tcp.fastopen.server_enabled` and
+    `net.inet.tcp.fastopen.client_enabled` need to be set to `1`.
+- For inbound, the `positive integer` set here represents the maximum number of
+  TFO connection requests to be processed, **note that not all operating systems
+  support this setting**:
+  - Linux/FreeBSD: The `positive integer` value set here represents the upper
+    limit, and the maximum acceptable value is 2147483647. If it is set to
+    `true`, it will take `256`. Note that in Linux, `net.core.somaxconn` will
+    limit the upper limit of this value. If it exceeds `somaxconn`, please also
+    increase `somaxconn`.
+  - Mac OS: When it is `true` or a `positive integer`, it only represents
+    enabling TFO, and the upper limit needs to be set separately through the
+    kernel parameter `net.inet.tcp.fastopen_backlog`.
+  - Windows: When it is `true` or a `positive integer`, it only represents
+    enabling TFO.
+- For outbound, setting it to `true` or a `positive integer` only represents
+  enabling TFO on any operating system.
 
 > `tproxy`: "redirect" | "tproxy" | "off"
 
 Specifies whether to enable transparent proxy (only applicable to Linux).
 
-- `"redirect"`: Use the transparent proxy in Redirect mode. It supports all TCP connections based on IPv4/6.
-- `"tproxy"`: Use the transparent proxy in TProxy mode. It supports all TCP and UDP connections based on IPv4/6.
+- `"redirect"`: Use the transparent proxy in Redirect mode. It supports all TCP
+  connections based on IPv4/6.
+- `"tproxy"`: Use the transparent proxy in TProxy mode. It supports all TCP and
+  UDP connections based on IPv4/6.
 - `"off"`: Turn off transparent proxy.
 
 Transparent proxy requires Root or `CAP\_NET\_ADMIN` permission.
 
-::: danger
-When `followRedirect` is set to `true` in [Dokodemo-door](./inbounds/dokodemo.md), and `tproxy` in the Sockopt settings is empty, the value of `tproxy` in the Sockopt settings will be set to `"redirect"`.
-:::
+::: danger When `followRedirect` is set to `true` in
+[Dokodemo-door](./inbounds/dokodemo.md), and `tproxy` in the Sockopt settings is
+empty, the value of `tproxy` in the Sockopt settings will be set to
+`"redirect"`. :::
 
-> `domainStrategy`: "AsIs"
-> "UseIP" | "UseIPv6v4" | "UseIPv6" | "UseIPv4v6" | "UseIPv4"
-> "ForceIP" | "ForceIPv6v4" | "ForceIPv6" | "ForceIPv4v6" | "ForceIPv4"
+> `domainStrategy`: "AsIs" "UseIP" | "UseIPv6v4" | "UseIPv6" | "UseIPv4v6" |
+> "UseIPv4" "ForceIP" | "ForceIPv6v4" | "ForceIPv6" | "ForceIPv4v6" |
+> "ForceIPv4"
 
-In previous versions, when Xray attempted to establish a system connection using a domain name, the resolution of the domain name was completed by the system and not controlled by Xray. This led to issues such as the inability to resolve domain names in non-standard Linux environments. To solve this problem, Xray 1.3.1 introduced Freedom's `domainStrategy` into Sockopt.
+In previous versions, when Xray attempted to establish a system connection using
+a domain name, the resolution of the domain name was completed by the system and
+not controlled by Xray. This led to issues such as the inability to resolve
+domain names in non-standard Linux environments. To solve this problem, Xray
+1.3.1 introduced Freedom's `domainStrategy` into Sockopt.
 
-When the target address is a domain name, the corresponding value is configured, and the behavior of SystemDialer is as follows:
+When the target address is a domain name, the corresponding value is configured,
+and the behavior of SystemDialer is as follows:
 
-- `"AsIs"`: Resolve the IP address using the system DNS server and connect to the domain name.
-- `"UseIP"`, `"UseIPv4"`, and `"UseIPv6"`: Resolve the IP address using the [built-in DNS server](./dns.md) and connect to the IP address directly.
-- "IPv4" means that you are trying to connect using only IPv4, "IPv4v6" means that you are trying to connect using either IPv4 or IPv6, but for dual-stack domain names, IPv4 is used. (The same applies to the v4v6 switch, so I won't go into details.)
-- When using "Use" the option beginning with , if the resolution result does not meet the requirements (for example, the domain name only has IPv4 resolution results but UseIPv6 is used), it will fall back to AsIs.
-- When using "Force" an option beginning with , if the parsing result does not meet the requirements, the connection cannot be established.
+- `"AsIs"`: Resolve the IP address using the system DNS server and connect to
+  the domain name.
+- `"UseIP"`, `"UseIPv4"`, and `"UseIPv6"`: Resolve the IP address using the
+  [built-in DNS server](./dns.md) and connect to the IP address directly.
+- "IPv4" means that you are trying to connect using only IPv4, "IPv4v6" means
+  that you are trying to connect using either IPv4 or IPv6, but for dual-stack
+  domain names, IPv4 is used. (The same applies to the v4v6 switch, so I won't
+  go into details.)
+- When using "Use" the option beginning with , if the resolution result does not
+  meet the requirements (for example, the domain name only has IPv4 resolution
+  results but UseIPv6 is used), it will fall back to AsIs.
+- When using "Force" an option beginning with , if the parsing result does not
+  meet the requirements, the connection cannot be established.
 
 The default value is `"AsIs"`.
 
@@ -539,20 +638,28 @@ The default value is `"AsIs"`.
 
 Improper configuration may cause infinite loops when this feature is enabled.
 
-In short, connecting to the server requires waiting for the DNS query result, and completing the DNS query requires connecting to the server.
+In short, connecting to the server requires waiting for the DNS query result,
+and completing the DNS query requires connecting to the server.
 
 > Tony: Which came first, the chicken or the egg?
 
 Explanation:
 
-1. Trigger condition: proxy server (proxy.com). Built-in DNS server, non-local mode.
-2. Before Xray attempts to establish a TCP connection to proxy.com, it queries proxy.com using the built-in DNS server.
-3. The built-in DNS server establishes a connection to dns.com and sends a query to obtain the IP address of proxy.com.
+1. Trigger condition: proxy server (proxy.com). Built-in DNS server, non-local
+   mode.
+2. Before Xray attempts to establish a TCP connection to proxy.com, it queries
+   proxy.com using the built-in DNS server.
+3. The built-in DNS server establishes a connection to dns.com and sends a query
+   to obtain the IP address of proxy.com.
 4. Improper routing rules cause proxy.com to proxy the query sent in step 3.
 5. Xray attempts to establish another TCP connection to proxy.com.
-6. Before establishing the connection, Xray queries proxy.com using the built-in DNS server.
-7. The built-in DNS server reuses the connection established in step 3 to send a query.
-8. A problem arises. The establishment of the connection in step 3 requires waiting for the query result in step 7, and the completion of the query in step 7 requires waiting for the connection in step 3 to be fully established.
+6. Before establishing the connection, Xray queries proxy.com using the built-in
+   DNS server.
+7. The built-in DNS server reuses the connection established in step 3 to send a
+   query.
+8. A problem arises. The establishment of the connection in step 3 requires
+   waiting for the query result in step 7, and the completion of the query in
+   step 7 requires waiting for the connection in step 3 to be fully established.
 9. Good game!
 
 Solution:
@@ -561,44 +668,51 @@ Solution:
 - Use Hosts file.
 - ~~If you still don't know the solution, then don't use this feature.~~
 
-Therefore, it is **not recommended** for inexperienced users to use this feature.
+Therefore, it is **not recommended** for inexperienced users to use this
+feature.
 
 :::
 
 > `dialerProxy`: ""
 
-An identifier for an outbound proxy. When the value is not empty, the specified outbound will be used to establish the connection. This option can be used to support chain forwarding of underlying transport protocols.
+An identifier for an outbound proxy. When the value is not empty, the specified
+outbound will be used to establish the connection. This option can be used to
+support chain forwarding of underlying transport protocols.
 
-::: danger
-This option is incompatible with ProxySettingsObject.Tag
-:::
+::: danger This option is incompatible with ProxySettingsObject.Tag :::
 
 > `acceptProxyProtocol`: true | false
 
 Only used for inbound, indicates whether to accept the PROXY protocol.
 
-[PROXY protocol](https://www.haproxy.org/download/2.2/doc/proxy-protocol.txt) is used to pass the true source IP and port of a request. **If you are not familiar with it, please ignore this option first**.
+[PROXY protocol](https://www.haproxy.org/download/2.2/doc/proxy-protocol.txt) is
+used to pass the true source IP and port of a request. **If you are not familiar
+with it, please ignore this option first**.
 
-Common reverse proxy software (such as HAProxy, Nginx) can be configured to send it, and VLESS fallbacks xver can also send it.
+Common reverse proxy software (such as HAProxy, Nginx) can be configured to send
+it, and VLESS fallbacks xver can also send it.
 
-When set to `true`, after the lowest-level TCP connection is established, the requesting party must first send PROXY protocol v1 or v2, otherwise the connection will be closed.
+When set to `true`, after the lowest-level TCP connection is established, the
+requesting party must first send PROXY protocol v1 or v2, otherwise the
+connection will be closed.
 
 > `tcpKeepAliveInterval`: number
 
-Interval between TCP keep-alive packets, in seconds. ~~This setting only applies to Linux.~~
+Interval between TCP keep-alive packets, in seconds. ~~This setting only applies
+to Linux.~~
 
-Not configuring this item or configuring it as 0 means using the default value of Go.
+Not configuring this item or configuring it as 0 means using the default value
+of Go.
 
-::: tip
-When filling in a negative number, such as `-1`, TCP keep-alive is not enabled.
-:::
+::: tip When filling in a negative number, such as `-1`, TCP keep-alive is not
+enabled. :::
 
 > `tcpcongestion`: ""
 
-TCP congestion control algorithm. Only supported by Linux. Not configuring this item means using the system default value.
+TCP congestion control algorithm. Only supported by Linux. Not configuring this
+item means using the system default value.
 
-::: tip
-Common algorithms
+::: tip Common algorithms
 
 - bbr (recommended)
 - cubic
@@ -606,19 +720,19 @@ Common algorithms
 
 :::
 
-::: tip
-Execute the command `sysctl net.ipv4.tcp_congestion_control` to get the system default value.
-:::
+::: tip Execute the command `sysctl net.ipv4.tcp_congestion_control` to get the
+system default value. :::
 
 > `interface`: ""
 
-Specifies the name of the bound outbound network interface. supported by Linux MacOS iOS.<br>
-MacOS iOS Requires Xray-core v1.8.6 or higher.
+Specifies the name of the bound outbound network interface. supported by Linux
+MacOS iOS.<br> MacOS iOS Requires Xray-core v1.8.6 or higher.
 
 > `tcpMptcp`: true | false
 
-Xray-core v1.8.6 New parameter.<br>
-Default value `false`, fill in `true` to enable [Multipath TCP](https://en.wikipedia.org/wiki/Multipath_TCP), need to be enabled in both server and client configuration.
+Xray-core v1.8.6 New parameter.<br> Default value `false`, fill in `true` to
+enable [Multipath TCP](https://en.wikipedia.org/wiki/Multipath_TCP), need to be
+enabled in both server and client configuration.
 
 > `tcpNoDelay`: true | false
 
@@ -626,7 +740,10 @@ Default value `false`, recommended to be enabled with "tcpMptcp": true.
 
 > `customSockopt`: []
 
-An array for advanced users to specify any sockopt. In theory, all the above connection-related settings can be set equivalently here. Naturally, other options that exist in Linux but have not been added to the core can also be set. The example below is equivalent to `"tcpcongestion": "bbr"` in core.
+An array for advanced users to specify any sockopt. In theory, all the above
+connection-related settings can be set equivalently here. Naturally, other
+options that exist in Linux but have not been added to the core can also be set.
+The example below is equivalent to `"tcpcongestion": "bbr"` in core.
 
 Please make sure you understand Linux socket programming before using it.
 
@@ -647,11 +764,13 @@ Required, the type of setting, valid values are `int` or `str`.
 
 > `level`: ""
 
-Optional, protocol level, used to specify the effective range, the default is `6`, which is TCP.
+Optional, protocol level, used to specify the effective range, the default is
+`6`, which is TCP.
 
 > `opt`: ""
 
-The option name of the operation, using decimal (the example here is that the value of `TCP_CONGESTION` is defined as `0xd` and converted to decimal is 13)
+The option name of the operation, using decimal (the example here is that the
+value of `TCP_CONGESTION` is defined as `0xd` and converted to decimal is 13)
 
 > `value`: ""
 
@@ -661,12 +780,17 @@ Decimal numbers are required when type is specified as int.
 
 > `happyEyeballs`: map
 
-only TCP, this is RFC-8305 implementation of happyEyeballs, only apply when built-in-dns is used(domainStrategy is `UseIP`/`ForceIP`).
-When we have multiple IPs, this algorithm tries to connect to each IP, the first-stablished-connection is winner connection and selected for sending/receiving data.
+only TCP, this is RFC-8305 implementation of happyEyeballs, only apply when
+built-in-dns is used(domainStrategy is `UseIP`/`ForceIP`). When we have multiple
+IPs, this algorithm tries to connect to each IP, the first-stablished-connection
+is winner connection and selected for sending/receiving data.
 
 ::: warning
 
-in `freedom` settings when you set `domainStrategy` to `UseIP`/`ForceIP` just a random IP will replace the domain and `happyEyeballs` does not apply, so for using `happyEyeballs` you should set `sockopt domainStrategy` to `UseIP/ForceIP` not `freedom domainStrategy`.
+in `freedom` settings when you set `domainStrategy` to `UseIP`/`ForceIP` just a
+random IP will replace the domain and `happyEyeballs` does not apply, so for
+using `happyEyeballs` you should set `sockopt domainStrategy` to `UseIP/ForceIP`
+not `freedom domainStrategy`.
 
 :::
 
@@ -681,8 +805,8 @@ in `freedom` settings when you set `domainStrategy` to `UseIP`/`ForceIP` just a 
 
 > `tryDelayMs`: number
 
-delay time between each attempt in millisecond, RFC-8305 recommend `250`, default is `0`.
-(if it is `0`, happy-eyeballs is disabled)
+delay time between each attempt in millisecond, RFC-8305 recommend `250`,
+default is `0`. (if it is `0`, happy-eyeballs is disabled)
 
 > `prioritizeIPv6`: bool
 
@@ -692,12 +816,17 @@ indicate "First Address Family" in RFC-8305, default is false(= prioritizeIPv4)
 
 indicate "First Address Family count" in RFC-8305, default is 1.
 
-for example suppose our IP-list is [ip4-1, ip4-2, ip4-3, ip4-4, ip6-1, ip6-2, ip6-3, ip6-4]
-when interleave is 1 and prioritizeIPv6 is false, the sorted-ip-list is:
-[ip4-1, ip6-1, ip4-2, ip6-2, ip4-3, ip6-3, ip4-4, ip6-4]
-and when for example interleave is 2 and prioritizeIPv6 is true:
-[ip6-1, ip6-2, ip4-1, ip4-2, ip6-3, ip6-4, ip4-3, ip4-4]
+for example suppose our IP-list is [ip4-1, ip4-2, ip4-3, ip4-4, ip6-1, ip6-2,
+ip6-3, ip6-4] when interleave is 1 and prioritizeIPv6 is false, the
+sorted-ip-list is: [ip4-1, ip6-1, ip4-2, ip6-2, ip4-3, ip6-3, ip4-4, ip6-4] and
+when for example interleave is 2 and prioritizeIPv6 is true: [ip6-1, ip6-2,
+ip4-1, ip4-2, ip6-3, ip6-4, ip4-3, ip4-4]
 
 > `maxConcurrentTry`: number
 
-maximum concurrent attempt (this is only maximum and in most cases our concurrent attempts is less, unless all connection fail to connect) also we can always have a maximum of concurrent-attempt as many IPs as we have, and this option is useful when the number of IPs is too high, and we want to control the number of concurrent-attempts, default is 4. if it is 0, happy-eyeballs is disabled.
+maximum concurrent attempt (this is only maximum and in most cases our
+concurrent attempts is less, unless all connection fail to connect) also we can
+always have a maximum of concurrent-attempt as many IPs as we have, and this
+option is useful when the number of IPs is too high, and we want to control the
+number of concurrent-attempts, default is 4. if it is 0, happy-eyeballs is
+disabled.

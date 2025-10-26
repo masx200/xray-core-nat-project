@@ -1,14 +1,16 @@
 # HTTP
 
-HTTP is a protocol that is used for communication over the internet. Please note that HTTP does not provide encryption for data transmission and is not suitable for transmitting sensitive information over public networks, as it can be easily targeted for attacks.
+HTTP is a protocol that is used for communication over the internet. Please note
+that HTTP does not provide encryption for data transmission and is not suitable
+for transmitting sensitive information over public networks, as it can be easily
+targeted for attacks.
 
-::: danger
-**The HTTP protocol does not provide encryption for transmission, making it unsuitable for transmitting over public networks and more susceptible to being used as a compromised host for attacks.**
-:::
+::: danger **The HTTP protocol does not provide encryption for transmission,
+making it unsuitable for transmitting over public networks and more susceptible
+to being used as a compromised host for attacks.** :::
 
-::: tip
-HTTP can only proxy TCP protocols, and cannot handle UDP-based protocols.
-:::
+::: tip HTTP can only proxy TCP protocols, and cannot handle UDP-based
+protocols. :::
 
 ## OutboundConfigurationObject
 
@@ -29,13 +31,13 @@ HTTP can only proxy TCP protocols, and cannot handle UDP-based protocols.
 }
 ```
 
-::: tip
-Currently, in the HTTP outbound protocol, the `streamSettings` configuration with `security` and `tlsSettings` is effective.
-:::
+::: tip Currently, in the HTTP outbound protocol, the `streamSettings`
+configuration with `security` and `tlsSettings` is effective. :::
 
 > `servers`: \[ [ServerObject](#serverobject) \]
 
-A list of HTTP servers, where each item represents a server configuration. If multiple servers are configured, they will be used in a round-robin manner.
+A list of HTTP servers, where each item represents a server configuration. If
+multiple servers are configured, they will be used in a round-robin manner.
 
 ### ServerObject
 

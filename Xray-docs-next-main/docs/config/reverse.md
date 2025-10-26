@@ -6,28 +6,32 @@
 
 反向代理的大致工作原理如下:
 
-- 假设在主机 A 中有一个网页服务器，这台主机没有公网 IP，无法在公网上直接访问。另有一台主机 B，它可以由公网访问。现在我们需要把 B 作为入口，把流量从 B 转发到 A。
+- 假设在主机 A 中有一个网页服务器，这台主机没有公网
+  IP，无法在公网上直接访问。另有一台主机 B，它可以由公网访问。现在我们需要把 B
+  作为入口，把流量从 B 转发到 A。
   - 在主机 B 中配置 Xray，接收外部请求，所以称为 `portal` （门户）。
   - 在主机 A 中配置 Xray，负责将B的转发和网页服务器桥接起来，称为`bridge`。
 
 - `bridge`
-  - `bridge` 会向 `portal` 主动建立连接以注册反向通道，此连接的目标地址（domain）可以自行设定。
-  - `bridge` 在收到`portal`转发过来的公网流量之后，会将其原封不动地发给主机 A 中的网页服务器。当然，这一步需要路由模块的配置。
+  - `bridge` 会向 `portal`
+    主动建立连接以注册反向通道，此连接的目标地址（domain）可以自行设定。
+  - `bridge` 在收到`portal`转发过来的公网流量之后，会将其原封不动地发给主机 A
+    中的网页服务器。当然，这一步需要路由模块的配置。
   - `bridge` 收到响应后，也会将响应原封不动地返回给`portal`。
 
 - `portal`
-  - `portal` 收到请求且domain匹配，则说明是由 `bridge` 发来的响应数据，这条连接会用于建立反向通道。
-  - `portal` 收到请求，domain不匹配，则说明是公网用户发来的连接，这种连接数据会转发给bridge.
+  - `portal` 收到请求且domain匹配，则说明是由 `bridge`
+    发来的响应数据，这条连接会用于建立反向通道。
+  - `portal`
+    收到请求，domain不匹配，则说明是公网用户发来的连接，这种连接数据会转发给bridge.
 
 - `bridge` 会根据流量的大小进行动态的负载均衡。
 
-::: tip
-如上所述，反向代理默认已开启 [Mux](../../development/protocols/muxcool/)，请不要在其用到的 outbound 上再次开启 Mux。
-:::
+::: tip 如上所述，反向代理默认已开启
+[Mux](../../development/protocols/muxcool/)，请不要在其用到的 outbound
+上再次开启 Mux。 :::
 
-::: warning
-反向代理功能尚处于测试阶段，可能会有一些问题。
-:::
+::: warning 反向代理功能尚处于测试阶段，可能会有一些问题。 :::
 
 ## ReverseObject
 
@@ -54,11 +58,13 @@
 
 > `bridges`: \[[BridgeObject](#bridgeobject)\]
 
-数组，每一项表示一个 `bridge`。每个 `bridge` 的配置是一个 [BridgeObject](#bridgeobject)。
+数组，每一项表示一个 `bridge`。每个 `bridge` 的配置是一个
+[BridgeObject](#bridgeobject)。
 
 > `portals`: \[[PortalObject](#portalobject)\]
 
-数组，每一项表示一个 `portal`。每个 `portal` 的配置是一个 [PortalObject](#bridgeobject)。
+数组，每一项表示一个 `portal`。每个 `portal` 的配置是一个
+[PortalObject](#bridgeobject)。
 
 ### BridgeObject
 
@@ -71,7 +77,8 @@
 
 > `tag`: string
 
-所有由 `bridge` 发出的连接，都会带有这个标识。可以在 [路由配置](./routing.md) 中使用 `inboundTag` 进行识别。
+所有由 `bridge` 发出的连接，都会带有这个标识。可以在 [路由配置](./routing.md)
+中使用 `inboundTag` 进行识别。
 
 > `domain`: string
 
@@ -89,25 +96,27 @@
 
 > `tag`: string
 
-`portal` 的标识。在 [路由配置](./routing.md) 中使用 `outboundTag` 将流量转发到这个 `portal`。
+`portal` 的标识。在 [路由配置](./routing.md) 中使用 `outboundTag`
+将流量转发到这个 `portal`。
 
 > `domain`: string
 
-一个域名。当 `portal` 接收到流量时，如果流量的目标域名是此域名，则 `portal` 认为当前连接上是 `bridge` 发来的通信连接。而其它流量则会被当成需要转发的流量。`portal` 所做的工作就是把这两类连接进行识别并做对应的转发。
+一个域名。当 `portal` 接收到流量时，如果流量的目标域名是此域名，则 `portal`
+认为当前连接上是 `bridge`
+发来的通信连接。而其它流量则会被当成需要转发的流量。`portal`
+所做的工作就是把这两类连接进行识别并做对应的转发。
 
-::: tip
-一个 Xray 既可以作为 `bridge`，也可以作为 `portal`，也可以同时两者，以适用于不同的场景需要。
-:::
+::: tip 一个 Xray 既可以作为 `bridge`，也可以作为
+`portal`，也可以同时两者，以适用于不同的场景需要。 :::
 
 ## 完整配置样例
 
-::: tip
-在运行过程中，建议先启用 `bridge`，再启用 `portal`。
-:::
+::: tip 在运行过程中，建议先启用 `bridge`，再启用 `portal`。 :::
 
 ### bridge 配置
 
-`bridge` 通常需要两个 outbound，一个用于连接 `portal`，另一个用于发送实际的流量。也就是说，你需要用路由区分两种流量。
+`bridge` 通常需要两个 outbound，一个用于连接
+`portal`，另一个用于发送实际的流量。也就是说，你需要用路由区分两种流量。
 
 反向代理配置:
 
@@ -182,7 +191,8 @@ outbound:
 
 ### portal 配置
 
-`portal` 通常需要两个 inbound，一个用于接收 `bridge` 的连接，另一个用于接收实际的流量。同时你也需要用路由区分两种流量。
+`portal` 通常需要两个 inbound，一个用于接收 `bridge`
+的连接，另一个用于接收实际的流量。同时你也需要用路由区分两种流量。
 
 反向代理配置:
 

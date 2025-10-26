@@ -4,26 +4,39 @@ title: TProxy 透明代理 (ipv4 and ipv6)
 
 # TProxy 透明代理（ipv4 and ipv6）配置教程
 
-本配置参考了[TProxy 透明代理的新 V2Ray 白话文教程](https://guide.v2fly.org/app/tproxy.html)，[透明代理（TProxy）配置教程](https://xtls.github.io/document/level-2/tproxy.html#%E5%BC%80%E5%A7%8B%E4%B9%8B%E5%89%8D)以及[透明代理通过 gid 规避 Xray 流量](https://xtls.github.io/document/level-2/iptables_gid.html)，加入了透明代理对 ipv6 的支持，并且使用 VLESS-TCP-XTLS-RPRX-Vision 方案对抗封锁 (推荐使用 1.7.2 及之后版本)。
+本配置参考了[TProxy 透明代理的新 V2Ray 白话文教程](https://guide.v2fly.org/app/tproxy.html)，[透明代理（TProxy）配置教程](https://xtls.github.io/document/level-2/tproxy.html#%E5%BC%80%E5%A7%8B%E4%B9%8B%E5%89%8D)以及[透明代理通过 gid 规避 Xray 流量](https://xtls.github.io/document/level-2/iptables_gid.html)，加入了透明代理对
+ipv6 的支持，并且使用 VLESS-TCP-XTLS-RPRX-Vision 方案对抗封锁 (推荐使用 1.7.2
+及之后版本)。
 
-关于 Xray 的配置并不是本文重点，使用者可依实际情况进行修改，具体可以参考[官方文档示例](https://github.com/XTLS/Xray-examples)或其他优秀示例 比如[@chika0801](https://github.com/chika0801/Xray-examples) 又如[@lxhao61](https://github.com/lxhao61/integrated-examples)。
+关于 Xray
+的配置并不是本文重点，使用者可依实际情况进行修改，具体可以参考[官方文档示例](https://github.com/XTLS/Xray-examples)或其他优秀示例
+比如[@chika0801](https://github.com/chika0801/Xray-examples)
+又如[@lxhao61](https://github.com/lxhao61/integrated-examples)。
 
 ::: warning 注意
 
-若使用其他配置，你需要着重注意客户端配置中 `outbound` 中`tag` 为 `proxy` 的部分，其他部分不变
+若使用其他配置，你需要着重注意客户端配置中 `outbound` 中`tag` 为 `proxy`
+的部分，其他部分不变
 
-服务端配置也要同时改变
-:::
+服务端配置也要同时改变 :::
 
-此配置意在解决例如 Netflix 等默认使用 ipv6 连接的网站无法通过旁路由进行代理的问题，或对 ipv6 代理有需要。
+此配置意在解决例如 Netflix 等默认使用 ipv6
+连接的网站无法通过旁路由进行代理的问题，或对 ipv6 代理有需要。
 
 本文网络结构为单臂旁路由
 
-本文中所有配置已在 Arch Linux (Kernel: 6.0.10) 环境下测试成功，如在其它环境中同理
+本文中所有配置已在 Arch Linux (Kernel: 6.0.10)
+环境下测试成功，如在其它环境中同理
 
-注意安装相应程序 `# sudo apt install iptables ip6tables` 或 `# sudo apt install nftables`。
+注意安装相应程序 `# sudo apt install iptables ip6tables` 或
+`# sudo apt install nftables`。
 
-若旁路由未安装 xray 程序，可以手动下载相应 xray 程序如 [Xray-linux-64.zip](https://github.com/XTLS/Xray-core/releases/download/v1.7.0/Xray-linux-64.zip) ，然后复制 [install-release.sh](https://github.com/XTLS/Xray-install/blob/main/install-release.sh) 文件到旁路由，赋予可执行权限 `# chmod 700 install-release.sh`，然后使用 `# ./install-release.sh --local Xray-linux-64.zip` 根据提示进行本地安装。
+若旁路由未安装 xray 程序，可以手动下载相应 xray 程序如
+[Xray-linux-64.zip](https://github.com/XTLS/Xray-core/releases/download/v1.7.0/Xray-linux-64.zip)
+，然后复制
+[install-release.sh](https://github.com/XTLS/Xray-install/blob/main/install-release.sh)
+文件到旁路由，赋予可执行权限 `# chmod 700 install-release.sh`，然后使用
+`# ./install-release.sh --local Xray-linux-64.zip` 根据提示进行本地安装。
 
 ## Xray 配置
 
@@ -295,20 +308,23 @@ ip -6 route add local ::/0 dev lo table 106
 # 直连从主路由发出
 ip route add default via 192.168.31.1 #写主路由 ipv4, 采用局域网设备上网设置方法一可不写此命令
 ip -6 route add default via fd00:6868:6868::1 #写主路由 ipv6, 采用局域网设备上网设置方法一可不写此命令
-
 ```
 
 ::: tip 使用方法
 
-直接将命令复制到旁路由终端执行
-:::
+直接将命令复制到旁路由终端执行 :::
 
 ::: tip 关于直连从主路由发出
 
-在旁路由使用命令`ip route show`，如果使用下属方法一，则`default via`后应是主路由 ip，无需更改；如使用下述方法二，则`default via`后应是旁路由 ip，此时直连网站 DNS 解析会回环，造成直连网站无法访问，因此需指定为主路由 ip。
-:::
+在旁路由使用命令`ip route show`，如果使用下属方法一，则`default via`后应是主路由
+ip，无需更改；如使用下述方法二，则`default via`后应是旁路由 ip，此时直连网站 DNS
+解析会回环，造成直连网站无法访问，因此需指定为主路由 ip。 :::
 
-如果是在路由器上指定了默认网关为旁路由（亦即下述“局域网设备上网设置方法二”），那么就需要设置上述 `# 直连从主路由发出` ，除了通过 iproute2 命令行方式设置，也可以通过 dhcpcd 或者 systemctl-network 设置静态 IP，这里以 dhcpcd 为例，编辑 `/etc/dhcpcd.conf` 文件，在最下方加入如下配置，具体 IP 根据你的实际情况修改，其中 `interface` 可以通过 `# ip link show` 查看要设定的网口或者无线设备。
+如果是在路由器上指定了默认网关为旁路由（亦即下述“局域网设备上网设置方法二”），那么就需要设置上述
+`# 直连从主路由发出` ，除了通过 iproute2 命令行方式设置，也可以通过 dhcpcd 或者
+systemctl-network 设置静态 IP，这里以 dhcpcd 为例，编辑 `/etc/dhcpcd.conf`
+文件，在最下方加入如下配置，具体 IP 根据你的实际情况修改，其中 `interface`
+可以通过 `# ip link show` 查看要设定的网口或者无线设备。
 
 ```
 interface enp0s25
@@ -322,8 +338,7 @@ static domain_name_servers=192.168.31.1 fd00:6868:6868::1
 
 ::: warning 注意
 
-以下 nftables 配置与 iptables 配置二选一，不可同时使用。
-:::
+以下 nftables 配置与 iptables 配置二选一，不可同时使用。 :::
 
 ### 使用 iptables
 
@@ -385,15 +400,15 @@ ip6tables -t mangle -N DIVERT
 ip6tables -t mangle -A DIVERT -j MARK --set-mark 1
 ip6tables -t mangle -A DIVERT -j ACCEPT
 ip6tables -t mangle -I PREROUTING -p tcp -m socket -j DIVERT
-
 ```
 
 ::: tip 使用方法
 
-将上述配置写入一个文件（如 `iptables.rules`），之后将该文件赋予可执行权限`# chmod 700 ./iptables.rules`
+将上述配置写入一个文件（如
+`iptables.rules`），之后将该文件赋予可执行权限`# chmod 700 ./iptables.rules`
 
-最后使用 root 权限执行该文件即可：`# ./iptables.rules`或`# source iptables.rules`。
-:::
+最后使用 root
+权限执行该文件即可：`# ./iptables.rules`或`# source iptables.rules`。 :::
 
 ### 使用 nftables
 
@@ -435,33 +450,40 @@ table inet xray {
                 meta l4proto tcp socket transparent 1 meta mark set 0x00000001 accept
         }
 }
-
 ```
 
 ::: tip 使用方法
 
-将上述配置写入一个文件（如 `nftables.rules`），之后将该文件赋予可执行权限`# chmod 700 ./nftables.rules`
+将上述配置写入一个文件（如
+`nftables.rules`），之后将该文件赋予可执行权限`# chmod 700 ./nftables.rules`
 
-最后使用 root 权限执行该文件即可：`# ./nftables.rules`或`# source nftables.rules`
-:::
+最后使用 root
+权限执行该文件即可：`# ./nftables.rules`或`# source nftables.rules` :::
 
-其中，网关地址`192.168.0.0/16`, `fd00::/8`等可由`ip address | grep -w inet | awk '{print $2}'`以及`ip address | grep -w inet6 | awk '{print $2}'`[获得](https://xtls.github.io/document/level-2/iptables_gid.html#_4-%E8%AE%BE%E7%BD%AE-iptables-%E8%A7%84%E5%88%99)
+其中，网关地址`192.168.0.0/16`,
+`fd00::/8`等可由`ip address | grep -w inet | awk '{print $2}'`以及`ip address | grep -w inet6 | awk '{print $2}'`
+[获得](https://xtls.github.io/document/level-2/iptables_gid.html#_4-%E8%AE%BE%E7%BD%AE-iptables-%E8%A7%84%E5%88%99)
 
 或者在 windows 网络设置中查看。
 
 又或者在路由器“上网设置”中查看。
 
-如果前缀`192.168`, `fd00:`相同可不更改，若不同如 `fc00:`, `fe00:` 等则更改为相应值，写法可通过 Goolge 搜索得到如 `fc00::/7`, `fe00::/9`。
+如果前缀`192.168`, `fd00:`相同可不更改，若不同如 `fc00:`, `fe00:`
+等则更改为相应值，写法可通过 Goolge 搜索得到如 `fc00::/7`, `fe00::/9`。
 
 ### 开机自动运行 Netfilter 配置
 
-首先确认已经运行过上述相应 Netfilter 命令，并且成功测试透明代理配置，以确保接下来输出正确的文件。
+首先确认已经运行过上述相应 Netfilter
+命令，并且成功测试透明代理配置，以确保接下来输出正确的文件。
 
 #### 若使用 iptables 配置
 
-1. 首先通过 `# iptables-save > /root/iptables.rulesv4` `# ip6tables-save > /root/iptables.rulesv6` 将 iptables 配置写入 `iptables.rulesv4` 和 `iptables.rulesv6` 文件中
+1. 首先通过 `# iptables-save > /root/iptables.rulesv4`
+   `# ip6tables-save > /root/iptables.rulesv6` 将 iptables 配置写入
+   `iptables.rulesv4` 和 `iptables.rulesv6` 文件中
 
-2. 然后在 `/etc/systemd/system/` 目录下创建一个名为 `tproxyrules.service` 的文件，添加以下内容并保存
+2. 然后在 `/etc/systemd/system/` 目录下创建一个名为 `tproxyrules.service`
+   的文件，添加以下内容并保存
 
 ```
 [Unit]
@@ -496,9 +518,11 @@ WantedBy=multi-user.target
 
 #### 如果使用 nftables 配置
 
-1. 首先通过 `# nft list ruleset > /root/nftables.rulesv46` 将 nftables 配置写入 `nftables.rulesv46` 文件中
+1. 首先通过 `# nft list ruleset > /root/nftables.rulesv46` 将 nftables 配置写入
+   `nftables.rulesv46` 文件中
 
-2. 在 `/etc/systemd/system/` 目录下创建一个名为 `tproxyrules.service` 的文件，然后添加以下内容并保存
+2. 在 `/etc/systemd/system/` 目录下创建一个名为 `tproxyrules.service`
+   的文件，然后添加以下内容并保存
 
 ```
 [Unit]
@@ -533,8 +557,9 @@ WantedBy=multi-user.target
 
 注意其中主路由器 IP 地址，根据实际修改
 
-`ExecStartPre=/bin/sh -c 'until ping -c1 192.168.31.1; do sleep 1; done;'` 命令为确保获得 IP 地址后再执行命令，否则会诡异报错，其中 IP 地址为主路由器地址，根据实际修改。
-:::
+`ExecStartPre=/bin/sh -c 'until ping -c1 192.168.31.1; do sleep 1; done;'`
+命令为确保获得 IP 地址后再执行命令，否则会诡异报错，其中 IP
+地址为主路由器地址，根据实际修改。 :::
 
 ::: warning 注意
 
@@ -543,39 +568,54 @@ WantedBy=multi-user.target
 
 ## 局域网设备上网设置
 
-此处假定旁路由 ipv4, ipv6 地址分别为`192.168.31.100`, `fd00:6868:6868::8866`, 旁路由的 ipv4, ipv6 地址可由命令`ip add`获得。
+此处假定旁路由 ipv4, ipv6 地址分别为`192.168.31.100`, `fd00:6868:6868::8866`,
+旁路由的 ipv4, ipv6 地址可由命令`ip add`获得。
 
 ### 方法一
 
-局域网设备上网有两种方式，第一种就是在使用设备上进行静态 IP 的配置，将网关指向旁路由 IP。注意绝大部分手机仅支持手动配置 ipv4 网关，不支持手动配置 ipv6 网关，除非 root 后进行相关设置。
+局域网设备上网有两种方式，第一种就是在使用设备上进行静态 IP
+的配置，将网关指向旁路由 IP。注意绝大部分手机仅支持手动配置 ipv4
+网关，不支持手动配置 ipv6 网关，除非 root 后进行相关设置。
 
-以 windows 设备为例，可以先开启 DHCP 记录自动分配的 IP 以参考，然后手写静态配置。
+以 windows 设备为例，可以先开启 DHCP 记录自动分配的 IP
+以参考，然后手写静态配置。
 
 ::: tip DNS 设置
 
-此配置劫持 DNS 流量，DNS 可以随便写
-:::
+此配置劫持 DNS 流量，DNS 可以随便写 :::
 
-<img width="231" alt="image" src="https://user-images.githubusercontent.com/110686480/208310266-632e36b9-a23b-4b90-aa28-583b50e87c66.png"> <img width="238" alt="image" src="https://user-images.githubusercontent.com/110686480/208309659-e3172218-ef27-4a94-a017-225f8e05b611.png">
+<img width="231" alt="image" src="https://user-images.githubusercontent.com/110686480/208310266-632e36b9-a23b-4b90-aa28-583b50e87c66.png">
+<img width="238" alt="image" src="https://user-images.githubusercontent.com/110686480/208309659-e3172218-ef27-4a94-a017-225f8e05b611.png">
 
 ### 方法二
 
-局域网设备上网的第二种方式，是在路由器上进行网关设置，这种方法对于连接到此路由器的设备无需做任何设置即可科学上网，但注意有些路由器不支持 ipv6 的网关设置，有 ipv6 需求的设备仍需在所需设备上单独手动配置 ipv6 相关设置参考方法一。
+局域网设备上网的第二种方式，是在路由器上进行网关设置，这种方法对于连接到此路由器的设备无需做任何设置即可科学上网，但注意有些路由器不支持
+ipv6 的网关设置，有 ipv6 需求的设备仍需在所需设备上单独手动配置 ipv6
+相关设置参考方法一。
 
 <img width="700" alt="image" src="https://user-images.githubusercontent.com/110686480/208310174-2245a890-eb6b-4341-899f-81c6ac8255ff.png">
 
 ## Finally
 
-按照以上方法设置后设备即可双栈访问，进入测试网站比如 https://ipv6-test.com/ 可以看到如下结果 (需要代理此网站才能看到如下结果)
+按照以上方法设置后设备即可双栈访问，进入测试网站比如 https://ipv6-test.com/
+可以看到如下结果 (需要代理此网站才能看到如下结果)
 
 <img width="700" alt="image" src="https://user-images.githubusercontent.com/110686480/208743723-f8a2751b-43d0-4353-9383-5ae0e00e9449.png">
 
 ## 写在最后
 
-如今 ipv6 并未完全普及，我们日常访问的流量 99%仍为 ipv4 流量；很多 VPS 商家虽然提供 ipv6 地址，但线路优化非常垃圾，甚至处于不可用状态，为何要加入 ipV6 的设置？
+如今 ipv6 并未完全普及，我们日常访问的流量 99%仍为 ipv4 流量；很多 VPS
+商家虽然提供 ipv6 地址，但线路优化非常垃圾，甚至处于不可用状态，为何要加入 ipV6
+的设置？
 
-可以看到目前 ipv6 处于很尴尬的境地，各种设备对于 ipv6 的支持很烂，但是都在逐步完善，同时 Windows 系统对于 ipv6 的优先级也在提高，很多浏览器也会优先进行 ipv6 的解析以及访问，很多网站也开始默认使用 ipv6 进行访问（比如 Netflix, 如果没有配置 ipv6, 浏览器打开 Netflix 会显示 Not Available 是因为没有代理 Netflix 的 ipv6 请求，当然可以选择禁用 Windows 的 ipv6，但支持 ipv6 的 pt 站就无法使用）
+可以看到目前 ipv6 处于很尴尬的境地，各种设备对于 ipv6
+的支持很烂，但是都在逐步完善，同时 Windows 系统对于 ipv6
+的优先级也在提高，很多浏览器也会优先进行 ipv6
+的解析以及访问，很多网站也开始默认使用 ipv6 进行访问（比如 Netflix, 如果没有配置
+ipv6, 浏览器打开 Netflix 会显示 Not Available 是因为没有代理 Netflix 的 ipv6
+请求，当然可以选择禁用 Windows 的 ipv6，但支持 ipv6 的 pt 站就无法使用）
 
-这种情况下 ipv4 无法完全胜任网络冲浪的需求，即使是那 1%的流量，遇到了也会让人头疼不已。
+这种情况下 ipv4 无法完全胜任网络冲浪的需求，即使是那
+1%的流量，遇到了也会让人头疼不已。
 
 而可以预见 ipv6 也会逐步与 ipv4 分庭抗礼，所以有必要加入 ipv6 的设置。

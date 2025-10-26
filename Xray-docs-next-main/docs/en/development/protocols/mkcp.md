@@ -1,10 +1,13 @@
 # mKCP Protocol
 
-mKCP is a stream transfer protocol, modified from the [KCP protocol](https://github.com/skywind3000/kcp), which can transmit any data stream in order.
+mKCP is a stream transfer protocol, modified from the
+[KCP protocol](https://github.com/skywind3000/kcp), which can transmit any data
+stream in order.
 
 ## Version
 
-mKCP has no version number and does not guarantee compatibility between versions.
+mKCP has no version number and does not guarantee compatibility between
+versions.
 
 ## Dependencies
 
@@ -14,15 +17,23 @@ mKCP is a protocol based on UDP, and all communication uses UDP transmission.
 
 ### Functions
 
-- fnv: [FNV-1a](https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function) hash function
+- fnv:
+  [FNV-1a](https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function)
+  hash function
   - Takes a string of arbitrary length as input parameter;
   - Outputs a 32-bit unsigned integer.
 
 ## Communication Process
 
-1. mKCP splits data streams into several data packets for transmission. Each data stream has a unique identifier to distinguish it from other data streams. Each data packet in the data stream carries the same identifier.
-2. mKCP does not have a handshake process. When receiving a data packet, it determines whether it is a new call or an ongoing call based on the identifier of the data stream it carries.
-3. Each data packet contains several segments (Segment), which are divided into three types: data (Data), acknowledgment (ACK), and heartbeat (Ping). Each segment needs to be processed separately.
+1. mKCP splits data streams into several data packets for transmission. Each
+   data stream has a unique identifier to distinguish it from other data
+   streams. Each data packet in the data stream carries the same identifier.
+2. mKCP does not have a handshake process. When receiving a data packet, it
+   determines whether it is a new call or an ongoing call based on the
+   identifier of the data stream it carries.
+3. Each data packet contains several segments (Segment), which are divided into
+   three types: data (Data), acknowledgment (ACK), and heartbeat (Ping). Each
+   segment needs to be processed separately.
 
 ## Data Format
 
@@ -50,9 +61,13 @@ as which:
 - Option Opt: Optional values include:
   - 0x00: Empty option
   - 0x01: Opposite party has sent all data
-- Timestamp Ts: Time when the current segment was sent from the remote end, big endian
-- Sequence Number Sn: The position of the data segment in the data stream, the sequence number of the starting segment is 0, and each new segment is sequentially added by 1
-- Unacknowledged Sequence Number Una: The minimum Sn that the remote host is sending and has not yet received confirmation.
+- Timestamp Ts: Time when the current segment was sent from the remote end, big
+  endian
+- Sequence Number Sn: The position of the data segment in the data stream, the
+  sequence number of the starting segment is 0, and each new segment is
+  sequentially added by 1
+- Unacknowledged Sequence Number Una: The minimum Sn that the remote host is
+  sending and has not yet received confirmation.
 
 ### Confirmation snippet
 
@@ -66,13 +81,17 @@ as which:
 - Command Cmd: Constant 0x00
 - Option Opt: Same as above
 - Window Wnd: The maximum sequence number that the remote host can receive
-- Next receive sequence number Sn: The smallest sequence number of the data segment that the remote host has not received
-- Timestamp Ts: The timestamp of the latest received data segment by the remote host, which can be used to calculate the delay
-- Received sequence numbers: Each 4 bytes, indicating that the data of this sequence number has been confirmed received.
+- Next receive sequence number Sn: The smallest sequence number of the data
+  segment that the remote host has not received
+- Timestamp Ts: The timestamp of the latest received data segment by the remote
+  host, which can be used to calculate the delay
+- Received sequence numbers: Each 4 bytes, indicating that the data of this
+  sequence number has been confirmed received.
 
 as which:
 
-- The remote host expects to receive data within the serial number [Sn, Wnd) range.
+- The remote host expects to receive data within the serial number [Sn, Wnd)
+  range.
 
 ### Heartbeat Fragments
 
@@ -88,5 +107,6 @@ as which:
   - 0x03: Normal heartbeat
 - Option Opt: Same as above
 - Unacknowledged sequence number Una: Same as the Una of the data fragment
-- Next receive sequence number Sn: Same as the Sn of the acknowledgement fragment
+- Next receive sequence number Sn: Same as the Sn of the acknowledgement
+  fragment
 - Delay Rto: Delay calculated by the remote host itself

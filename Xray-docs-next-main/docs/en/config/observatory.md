@@ -1,8 +1,8 @@
 # Connection Monitoring
 
-The connection monitoring component uses HTTPing to detect the connection
-status of outbound proxies. The monitoring results can be used by other
-components, such as load balancers. There are currently two options:
+The connection monitoring component uses HTTPing to detect the connection status
+of outbound proxies. The monitoring results can be used by other components,
+such as load balancers. There are currently two options:
 [observatory](#observatoryobject) (background connection monitoring) and
 [burstObservatory](#burstobservatoryobject) (concurrent connection monitoring).
 You can choose one of them as needed.
@@ -20,7 +20,9 @@ You can choose one of them as needed.
 
 > `subjectSelector`: \[ string \]
 
-An array of strings, where each string is used to match the prefix of outbound proxy identifiers. Among the following outbound proxy identifiers: `["a", "ab", "c", "ba"]`, `"subjectSelector": ["a"]` will match `["a", "ab"]`.
+An array of strings, where each string is used to match the prefix of outbound
+proxy identifiers. Among the following outbound proxy identifiers:
+`["a", "ab", "c", "ba"]`, `"subjectSelector": ["a"]` will match `["a", "ab"]`.
 
 > `probeUrl`: string
 
@@ -28,12 +30,17 @@ The URL used to detect the connection status of the outbound proxy.
 
 > `probeInterval`: string
 
-The interval at which probes are initiated. The time format is a number followed by a unit, such as `"10s"`, `"2h45m"`. Supported time units include `ns`, `us`, `ms`, `s`, `m`, `h`, corresponding to nanoseconds, microseconds, milliseconds, seconds, minutes, and hours, respectively.
+The interval at which probes are initiated. The time format is a number followed
+by a unit, such as `"10s"`, `"2h45m"`. Supported time units include `ns`, `us`,
+`ms`, `s`, `m`, `h`, corresponding to nanoseconds, microseconds, milliseconds,
+seconds, minutes, and hours, respectively.
 
 > `enableConcurrency`: true | false
 
-- `true`: Concurrently probe all matching outbound proxies, then pause for the time set by `probeInterval`.
-- `false`: Probe each matching outbound proxy one by one, pausing for the time set by `probeInterval` after probing each one.
+- `true`: Concurrently probe all matching outbound proxies, then pause for the
+  time set by `probeInterval`.
+- `false`: Probe each matching outbound proxy one by one, pausing for the time
+  set by `probeInterval` after probing each one.
 
 ## BurstObservatoryObject
 
@@ -46,7 +53,9 @@ The interval at which probes are initiated. The time format is a number followed
 
 > `subjectSelector`: \[ string \]
 
-An array of strings, where each string is used to match the prefix of outbound proxy identifiers. Among the following outbound proxy identifiers: `["a", "ab", "c", "ba"]`, `"subjectSelector": ["a"]` will match `["a", "ab"]`.
+An array of strings, where each string is used to match the prefix of outbound
+proxy identifiers. Among the following outbound proxy identifiers:
+`["a", "ab", "c", "ba"]`, `"subjectSelector": ["a"]` will match `["a", "ab"]`.
 
 > `pingConfig`: [PingConfigObject](#PingConfigObject)
 
@@ -64,15 +73,21 @@ An array of strings, where each string is used to match the prefix of outbound p
 
 > `destination`: string
 
-The URL used to detect the connection status of the outbound proxy. This URL should return an HTTP 204 success status code.
+The URL used to detect the connection status of the outbound proxy. This URL
+should return an HTTP 204 success status code.
 
 > `connectivity`: string
 
-The URL used to check local network connectivity. An empty string means that local network connectivity is not checked.
+The URL used to check local network connectivity. An empty string means that
+local network connectivity is not checked.
 
 > `interval`: string
 
-Within the specified time, probe all matching outbound proxies, probing each proxy `sampling + 1` times. The time format is a number followed by a unit, such as `"10s"`, `"2h45m"`. Supported time units include `ns`, `us`, `ms`, `s`, `m`, `h`, corresponding to nanoseconds, microseconds, milliseconds, seconds, minutes, and hours, respectively.
+Within the specified time, probe all matching outbound proxies, probing each
+proxy `sampling + 1` times. The time format is a number followed by a unit, such
+as `"10s"`, `"2h45m"`. Supported time units include `ns`, `us`, `ms`, `s`, `m`,
+`h`, corresponding to nanoseconds, microseconds, milliseconds, seconds, minutes,
+and hours, respectively.
 
 > `sampling`: number
 

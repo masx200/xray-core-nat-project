@@ -1,14 +1,14 @@
 import { defaultTheme } from "@vuepress/theme-default";
 // import { path, getDirname } from '@vuepress/utils'
-import { path, getDirname } from "vuepress/utils";
+import { getDirname, path } from "vuepress/utils";
 import process from "node:process";
 import {
   navbarEn,
-  navbarZh,
   navbarRu,
+  navbarZh,
   sidebarEn,
-  sidebarZh,
   sidebarRu,
+  sidebarZh,
 } from "./config/index.js";
 
 let __dirname = getDirname(import.meta.url);

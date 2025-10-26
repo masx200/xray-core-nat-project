@@ -1,12 +1,11 @@
 # Command Parameters
 
-::: tip
-Xray uses Go-style commands and parameters
-:::
+::: tip Xray uses Go-style commands and parameters :::
 
 ## Get Basic Commands
 
-You can run `xray help`to get the most basic usage of all xray, as well as available commands and instructions.
+You can run `xray help`to get the most basic usage of all xray, as well as
+available commands and instructions.
 
 ```
 Xray is a platform for building proxies.
@@ -26,7 +25,6 @@ The commands are:
         wg           Generate key pair for wireguard key exchange
 
 Use "xray help <command>" for more information about a command.
-
 ```
 
 ### xray run
@@ -36,7 +34,7 @@ Specify one or more configuration files and run.
 Usage:
 
 ```
- xray run [-c config.json] [-confdir dir]
+xray run [-c config.json] [-confdir dir]
 ```
 
 ```
@@ -56,9 +54,9 @@ without launching the server
 The -dump flag tells Xray to print the merged config.
 ```
 
-::: tip
-Except from the default JSON format, config can also use TOML and YAML. It will automatically recognized from file extensions when the `-format` flag is not set.
-:::
+::: tip Except from the default JSON format, config can also use TOML and YAML.
+It will automatically recognized from file extensions when the `-format` flag is
+not set. :::
 
 ### xray version
 
@@ -67,7 +65,7 @@ Output Xray version, Golang version and other information.
 Usage:
 
 ```
- xray version
+xray version
 ```
 
 ### xray api
@@ -81,14 +79,14 @@ xray api <command> [arguments]
 ```
 
 ```
-        restartlogger Restart the logger
-        stats         Get statistics
-        statsquery    Query statistics
-        statssys      Get system statistics
-        adi           Add inbounds
-        ado           Add outbounds
-        rmi           Remove inbounds
-        rmo           Remove outbounds
+restartlogger Restart the logger
+stats         Get statistics
+statsquery    Query statistics
+statssys      Get system statistics
+adi           Add inbounds
+ado           Add outbounds
+rmi           Remove inbounds
+rmo           Remove outbounds
 ```
 
 ### xray convert
@@ -157,9 +155,9 @@ xray tls <command> [arguments]
 ```
 
 ```
-        cert          Generate TLS certificates
-        ping          Ping the domain with TLS handshake
-        certChainHash Calculate TLS certificates hash.
+cert          Generate TLS certificates
+ping          Ping the domain with TLS handshake
+certChainHash Calculate TLS certificates hash.
 ```
 
 ### xray uuid
@@ -192,9 +190,9 @@ Usage:
 xray wg [-i "(base64.StdEncoding)"]
 ```
 
-::: tip
-When `-config` is not specified, Xray will try to load `config.json` from the following paths:
+::: tip When `-config` is not specified, Xray will try to load `config.json`
+from the following paths:
 
 - Working Directory
-- The path specified by `Xray.location.asset` in the [environment variable](../config/features/env.md).
-  :::
+- The path specified by `Xray.location.asset` in the
+  [environment variable](../config/features/env.md). :::

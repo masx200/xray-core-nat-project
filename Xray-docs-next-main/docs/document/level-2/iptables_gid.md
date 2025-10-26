@@ -4,7 +4,13 @@ title: GID 透明代理
 
 # 透明代理通过 gid 规避 Xray 流量
 
-在现有的 iptables 透明代理白话文(**[新 V2Ray 白话文指南-透明代理](https://guide.v2fly.org/app/transparent_proxy.html)** 、 **[新 V2Ray 白话文指南-透明代理(TPROXY)](https://guide.v2fly.org/app/tproxy.html)** 、 **[透明代理（TProxy）配置教程](./tproxy)**)教程中，对 Xray 流量的规避处理是打 mark 实现的。即对 Xray 出站流量打 mark，通过设置 iptables 规则对对应 mark 的流量直连，来规避 Xray 流量，防止回环。
+在现有的 iptables
+透明代理白话文(**[新 V2Ray 白话文指南-透明代理](https://guide.v2fly.org/app/transparent_proxy.html)**
+、
+**[新 V2Ray 白话文指南-透明代理(TPROXY)](https://guide.v2fly.org/app/tproxy.html)**
+、 **[透明代理（TProxy）配置教程](./tproxy)**)教程中，对 Xray 流量的规避处理是打
+mark 实现的。即对 Xray 出站流量打 mark，通过设置 iptables 规则对对应 mark
+的流量直连，来规避 Xray 流量，防止回环。
 
 这么做有以下几个问题：
 
@@ -20,7 +26,8 @@ tproxy 流量只能被 root 权限用户(uid==0)或其他有 CAP_NET_ADMIN 权�
 
 iptables 规则可以通过 uid(用户 id)和 gid(用户组 id)分流。
 
-让 Xray 运行在一个 uid==0 但 gid!=0 的用户上，设置 iptables 规则不代理该 gid 的流量来规避 Xray 流量。
+让 Xray 运行在一个 uid==0 但 gid!=0 的用户上，设置 iptables 规则不代理该 gid
+的流量来规避 Xray 流量。
 
 ## 配置过程
 
@@ -30,7 +37,8 @@ iptables 规则可以通过 uid(用户 id)和 gid(用户组 id)分流。
 
 1. 系统已 root
 
-2. 安装 **[busybox](https://play.google.com/store/apps/details?id=stericson.busybox)**
+2. 安装
+   **[busybox](https://play.google.com/store/apps/details?id=stericson.busybox)**
 
 3. 有一个可以执行命令的终端，可以使用 adb shell，termux 等。
 
@@ -58,8 +66,8 @@ opkg install libopenssl ca-certificates
 grep -qw xray_tproxy /etc/passwd || echo "xray_tproxy:x:0:23333:::" >> /etc/passwd
 ```
 
-其中 xray_tproxy 是用户名，0 是 uid，23333 是 gid，用户名和 gid 可以自己定，uid 必须为 0。
-检查用户是否添加成功，运行
+其中 xray_tproxy 是用户名，0 是 uid，23333 是 gid，用户名和 gid 可以自己定，uid
+必须为 0。 检查用户是否添加成功，运行
 
 ```bash
 sudo -u xray_tproxy id
@@ -69,11 +77,16 @@ sudo -u xray_tproxy id
 
 ### 3. 配置运行 Xray，配置 iptables 规则
 
-在现有的 iptables 透明代理白话文(**[新 V2Ray 白话文指南-透明代理](https://guide.v2fly.org/app/transparent_proxy.html)** 、 **[新 V2Ray 白话文指南-透明代理(TPROXY)](https://guide.v2fly.org/app/tproxy.html)** 、 **[透明代理（TProxy）配置教程](./tproxy)**)教程的基础上修改：
+在现有的 iptables
+透明代理白话文(**[新 V2Ray 白话文指南-透明代理](https://guide.v2fly.org/app/transparent_proxy.html)**
+、
+**[新 V2Ray 白话文指南-透明代理(TPROXY)](https://guide.v2fly.org/app/tproxy.html)**
+、 **[透明代理（TProxy）配置教程](./tproxy)**)教程的基础上修改：
 
 1. 修改 json 配置文件，删除 mark 相关内容
 
-2. 修改 iptables 规则，删除 mark 相关内容，并在 OUTPUT 链应用规则处添加选项"-m owner ! --gid-owner 23333"。
+2. 修改 iptables 规则，删除 mark 相关内容，并在 OUTPUT 链应用规则处添加选项"-m
+   owner ! --gid-owner 23333"。
 
 如：
 
@@ -87,7 +100,8 @@ iptables -t mangle -A OUTPUT -j XRAY_SELF
 iptables -t mangle -A OUTPUT -m owner ! --gid-owner 23333 -j XRAY_SELF
 ```
 
-3. 修改运行 Xray 的方式，使其运行在 uid 为 0，gid 为 23333 的用户上，参考[这里](#3-配置最大文件打开数运行xray客户端)。
+3. 修改运行 Xray 的方式，使其运行在 uid 为 0，gid 为 23333
+   的用户上，参考[这里](#3-配置最大文件打开数运行xray客户端)。
 
 ## 下面提供一个实现 tproxy 全局代理的完整配置过程
 
@@ -124,7 +138,8 @@ iptables -t mangle -A OUTPUT -m owner ! --gid-owner 23333 -j XRAY_SELF
 
 ### 3. 配置最大文件打开数&运行 Xray 客户端
 
-关于最大文件打开数问题见： **[too many open files 问题](https://guide.v2fly.org/app/tproxy.html#解决-too-many-open-files-问题)**
+关于最大文件打开数问题见：
+**[too many open files 问题](https://guide.v2fly.org/app/tproxy.html#解决-too-many-open-files-问题)**
 
 目前 Xray 服务端使用官方脚本安装的已经自动配置了最大文件打开数，无需再修改。
 
@@ -151,7 +166,8 @@ sudo -u xray_tproxy xray -c /etc/xray/config.json &
 
 _第一条命令：_
 
-改变最大打开文件数，只对当前终端有效，每次启动 Xray 前都要运行，该命令是设置客户端的最大文件打开数
+改变最大打开文件数，只对当前终端有效，每次启动 Xray
+前都要运行，该命令是设置客户端的最大文件打开数
 
 _第二条命令：_
 
@@ -163,7 +179,8 @@ _第二条命令：_
 cat /proc/Xray的pid/limits
 ```
 
-找到 max open files 一项，应该是你设置的数值。pid 的获取方法为运行`ps`或`ps -aux`或`ps -a`或`pidof xray`
+找到 max open files 一项，应该是你设置的数值。pid
+的获取方法为运行`ps`或`ps -aux`或`ps -a`或`pidof xray`
 
 服务端和客户端都要检查
 

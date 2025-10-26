@@ -8,12 +8,15 @@ title: 出站流量重定向
 
 ## 前言
 
-之前在网络上看到许多代理或者 VPN 会接管全局路由，如果与 Xray 同时安装，会导致 Xray 失效。参考了网络上许多教程，及时分流，也是通过维护一张或者多张 CIDR
+之前在网络上看到许多代理或者 VPN 会接管全局路由，如果与 Xray 同时安装，会导致
+Xray 失效。参考了网络上许多教程，及时分流，也是通过维护一张或者多张 CIDR
 路由表来实现的。这种情况下并不优雅，如果我想可以任意替换，实现按需分流，那有没有更好的办法呢？有！
 
-通过 fwmark 或 Xray 的 sendThrough/sockopt.interface，再简单配合路由表功能即可实现：
+通过 fwmark 或 Xray 的
+sendThrough/sockopt.interface，再简单配合路由表功能即可实现：
 
-1. Xray 可设置指定的 Tag、域名等走指定接口。如果您的接口是双栈的，可以指定 IPV4 或者 IPV6
+1. Xray 可设置指定的 Tag、域名等走指定接口。如果您的接口是双栈的，可以指定 IPV4
+   或者 IPV6
 2. 其余用户则走原 IPV4 或者 IPV6
 
 具体设置如下（以 Debian10 为例）：
@@ -64,18 +67,16 @@ PostDown = ip -6 rule del oif %i lookup <table>
 ::: tip
 
 - 此配置文件融合了 `fwmark` / `sendThrough` / `sockopt.interface`，表示
-- 送入此设备 `%i` 的连接 / 送入此 `<IPv4/6>` 的连接 / `fwmark` 被标记为 `<mark>` 的连接
+- 送入此设备 `%i` 的连接 / 送入此 `<IPv4/6>` 的连接 / `fwmark` 被标记为 `<mark>`
+  的连接
 - 将会使用 wireguard 进行转发
-- `%i` 是 wireguard 配置文件中的占位符，表示在启动时替换为这个设备的名称
-  :::
+- `%i` 是 wireguard 配置文件中的占位符，表示在启动时替换为这个设备的名称 :::
 
 保存
 
 可顺手安装
 
-::: warning
-如果使用了 `[Interface]` 中的 `DNS` 字段，这个程序将会是必须的
-:::
+::: warning 如果使用了 `[Interface]` 中的 `DNS` 字段，这个程序将会是必须的 :::
 
 ```bash
 apt install openresolv
@@ -206,17 +207,13 @@ lsmod | grep wireguard
 }
 ```
 
-::: tip
-可以通过修改 "domainStrategy": "UseIPv6"来控制对应用户的访问方式 实测优先级要高于系统本身的 gai.config
-:::
+::: tip 可以通过修改 "domainStrategy": "UseIPv6"来控制对应用户的访问方式
+实测优先级要高于系统本身的 gai.config :::
 
 ## 5、系统设置配置
 
-::: tip
-需要打开系统的 ip_forward
-`sysctl -w net.ipv4.ip_forward=1`
-`sysctl -w net.ipv6.conf.all.forwarding=1`
-:::
+::: tip 需要打开系统的 ip_forward `sysctl -w net.ipv4.ip_forward=1`
+`sysctl -w net.ipv6.conf.all.forwarding=1` :::
 
 ## 6、完成 WireGuard 相关设置
 
@@ -239,10 +236,14 @@ systemctl start wg-quick@wg0
 
 ## 后记
 
-本文本意是可以避免的多余的流量浪费，将路由和分流的功能交给 Xray 处理。避免了维护路由表的繁琐工作。顺便技术提升 UP。
+本文本意是可以避免的多余的流量浪费，将路由和分流的功能交给 Xray
+处理。避免了维护路由表的繁琐工作。顺便技术提升 UP。
 
 ## 感谢
 
-[XTLS/Xray-core](https://github.com/XTLS/Xray-core); [v2fly/v2ray-core](https://github.com/v2fly/v2ray-core); [WireGuard](https://www.wireguard.com/); [@p3terx](https://p3terx.com/); @w; @Hiram; @Luminous; @Ln; @JackChou;
+[XTLS/Xray-core](https://github.com/XTLS/Xray-core);
+[v2fly/v2ray-core](https://github.com/v2fly/v2ray-core);
+[WireGuard](https://www.wireguard.com/); [@p3terx](https://p3terx.com/); @w;
+@Hiram; @Luminous; @Ln; @JackChou;
 
 <!--剩下几位大佬我实在找不到他们的地址或Github空间，请大家帮忙找吧-->

@@ -1,6 +1,8 @@
 # RAW
 
-更名自曾经的 TCP 传输层（原名称有歧义），出站 RAW 传输层直接发送经代理协议包装后产生的 TCP、UDP 数据，核心不使用其它传输层（如 [XHTTP](https://github.com/XTLS/Xray-core/discussions/4113)）承载其流量。
+更名自曾经的 TCP 传输层（原名称有歧义），出站 RAW
+传输层直接发送经代理协议包装后产生的 TCP、UDP 数据，核心不使用其它传输层（如
+[XHTTP](https://github.com/XTLS/Xray-core/discussions/4113)）承载其流量。
 
 可以和各种协议有多种组合模式。
 
@@ -21,21 +23,24 @@
 
 仅用于 inbound，指示是否接收 PROXY protocol。
 
-[PROXY protocol](https://www.haproxy.org/download/2.2/doc/proxy-protocol.txt) 专用于传递请求的真实来源 IP 和端口，**若你不了解它，请先忽略该项**。
+[PROXY protocol](https://www.haproxy.org/download/2.2/doc/proxy-protocol.txt)
+专用于传递请求的真实来源 IP 和端口，**若你不了解它，请先忽略该项**。
 
-常见的反代软件（如 HAProxy、Nginx）都可以配置发送它，VLESS fallbacks xver 也可以发送它。
+常见的反代软件（如 HAProxy、Nginx）都可以配置发送它，VLESS fallbacks xver
+也可以发送它。
 
-填写 `true` 时，最底层 TCP 连接建立后，请求方必须先发送 PROXY protocol v1 或 v2，否则连接会被关闭。
+填写 `true` 时，最底层 TCP 连接建立后，请求方必须先发送 PROXY protocol v1 或
+v2，否则连接会被关闭。
 
 默认值为 `false`。
 
-> `header`: [NoneHeaderObject](#noneheaderobject) | [HttpHeaderobject](#httpheaderobject)
+> `header`: [NoneHeaderObject](#noneheaderobject) |
+> [HttpHeaderobject](#httpheaderobject)
 
 数据包头部伪装设置，默认值为 `NoneHeaderObject`。
 
-::: tip
-HTTP 伪装无法被其它 HTTP 服务器（如 Nginx）分流，但可以被 VLESS fallbacks path 分流。
-:::
+::: tip HTTP 伪装无法被其它 HTTP 服务器（如 Nginx）分流，但可以被 VLESS
+fallbacks path 分流。 :::
 
 ### NoneHeaderObject
 

@@ -1,6 +1,7 @@
 # Beginner's Tips
 
-**This chapter is an introductory level guide on using Xray, mainly sharing the principles of some commonly used functional modules in Xray.**
+**This chapter is an introductory level guide on using Xray, mainly sharing the
+principles of some commonly used functional modules in Xray.**
 
 [Analysis of Fallbacks Function](./fallbacks-lv1.md)
 

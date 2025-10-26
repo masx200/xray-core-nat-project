@@ -14,8 +14,11 @@ VMess 是一个基于 TCP 的协议，所有数据使用 TCP 传输。
 
 ### 用户 ID
 
-ID 等价于 [UUID](https://en.wikipedia.org/wiki/Universally_unique_identifier)，是一个 16 字节长的随机数，它的作用相当于一个令牌（Token）。
-一个 ID 形如：de305d54-75b4-431b-adb2-eb6b9e546014，几乎完全随机，可以使用任何的 UUID 生成器来生成，比如[这个](https://www.uuidgenerator.net/)。
+ID 等价于
+[UUID](https://en.wikipedia.org/wiki/Universally_unique_identifier)，是一个 16
+字节长的随机数，它的作用相当于一个令牌（Token）。 一个 ID
+形如：de305d54-75b4-431b-adb2-eb6b9e546014，几乎完全随机，可以使用任何的 UUID
+生成器来生成，比如[这个](https://www.uuidgenerator.net/)。
 
 用户 ID 可在[配置文件](../../config)中指定。
 
@@ -24,7 +27,8 @@ ID 等价于 [UUID](https://en.wikipedia.org/wiki/Universally_unique_identifier)
 - MD5: [MD5 函数](https://en.wikipedia.org/wiki/MD5)
   - 输入参数为任意长度的 byte 数组
   - 输出为一个 16 byte 的数组
-- HMAC: [HMAC 函数](https://en.wikipedia.org/wiki/Hash-based_message_authentication_code)
+- HMAC:
+  [HMAC 函数](https://en.wikipedia.org/wiki/Hash-based_message_authentication_code)
   - 输入参数为：
     - H：散列函数
     - K：密钥，任意长度的 byte 数组
@@ -35,9 +39,11 @@ ID 等价于 [UUID](https://en.wikipedia.org/wiki/Universally_unique_identifier)
 
 ## 通讯过程
 
-VMess 是一个无状态协议，即客户端和服务器之间不需要握手即可直接传输数据，每一次数据传输对之前和之后的其它数据传输没有影响。
+VMess
+是一个无状态协议，即客户端和服务器之间不需要握手即可直接传输数据，每一次数据传输对之前和之后的其它数据传输没有影响。
 
-VMess 的客户端发起一次请求，服务器判断该请求是否来自一个合法的客户端。如验证通过，则转发该请求，并把获得的响应发回给客户端。
+VMess
+的客户端发起一次请求，服务器判断该请求是否来自一个合法的客户端。如验证通过，则转发该请求，并把获得的响应发回给客户端。
 
 VMess 使用非对称格式，即客户端发出的请求和服务器端的响应使用了不同的格式。
 
@@ -85,7 +91,8 @@ VMess 使用非对称格式，即客户端发出的请求和服务器端的响�
     - 只有当 S 开启时，这一项才有效；
   - M (0x04)：开启元数据混淆（建议开启）；
     - 只有当 S 开启时，这一项才有效；
-    - 当其项开启时，客户端和服务器端需要分别构造两个 Shake 实例，分别为 RequestMask = Shake(请求数据 IV), ResponseMask = Shake(响应数据 IV)。
+    - 当其项开启时，客户端和服务器端需要分别构造两个 Shake 实例，分别为
+      RequestMask = Shake(请求数据 IV), ResponseMask = Shake(响应数据 IV)。
   - X：保留
 - 余量 P：在校验值之前加入 P 字节的随机值；
 - 加密方式：指定数据部分的加密方式，可选的值有：
@@ -109,7 +116,8 @@ VMess 使用非对称格式，即客户端发出的请求和服务器端的响�
 
 ### 数据部分
 
-当 Opt(S) 开启时，数据部分使用此格式。实际的请求数据被分割为若干个小块，每个小块的格式如下。服务器校验完所有的小块之后，再按基本格式的方式进行转发。
+当 Opt(S)
+开启时，数据部分使用此格式。实际的请求数据被分割为若干个小块，每个小块的格式如下。服务器校验完所有的小块之后，再按基本格式的方式进行转发。
 
 | 2 字节 | L 字节 |
 | :----: | :----: |
@@ -118,10 +126,12 @@ VMess 使用非对称格式，即客户端发出的请求和服务器端的响�
 其中：
 
 - 长度 L：Big Endian 格式的整型，最大值为 2^14；
-  - 当 Opt(M) 开启时，L 的值 = 真实值 xor Mask。Mask = (RequestMask.NextByte() << 8) + RequestMask.NextByte()；
+  - 当 Opt(M) 开启时，L 的值 = 真实值 xor Mask。Mask = (RequestMask.NextByte()
+    << 8) + RequestMask.NextByte()；
 - 数据包：由指定的加密方式加密过的数据包；
 
-在传输结束之前，数据包中必须有实际数据，即除了长度和认证数据之外的数据。当传输结束时，客户端必须发送一个空的数据包，即 L = 0（不加密） 或认证数据长度（有加密），来表示传输结束。
+在传输结束之前，数据包中必须有实际数据，即除了长度和认证数据之外的数据。当传输结束时，客户端必须发送一个空的数据包，即
+L = 0（不加密） 或认证数据长度（有加密），来表示传输结束。
 
 按加密方式不同，数据包的格式如下：
 
@@ -130,16 +140,20 @@ VMess 使用非对称格式，即客户端发出的请求和服务器端的响�
 - AES-128-CFB：整个数据部分使用 AES-128-CFB 加密
   - 4 字节：实际数据的 FNV1a hash；
   - L - 4 字节：实际数据；
-- AES-128-GCM：Key 为指令部分的 Key，IV = count (2 字节) + IV (10 字节)。count 从 0 开始递增，每个数据包加 1；IV 为 指令部分 IV 的第 3 至第 12 字节。
+- AES-128-GCM：Key 为指令部分的 Key，IV = count (2 字节) + IV (10 字节)。count
+  从 0 开始递增，每个数据包加 1；IV 为 指令部分 IV 的第 3 至第 12 字节。
   - L - 16 字节：实际数据；
   - 16 字节：GCM 认证信息
-- ChaCha20-Poly1305：Key = MD5(指令部分 Key) + MD5(MD5(指令部分 Key))，IV = count (2 字节) + IV (10 字节)。count 从 0 开始递增，每个数据包加 1；IV 为 指令部分 IV 的第 3 至第 12 字节。
+- ChaCha20-Poly1305：Key = MD5(指令部分 Key) + MD5(MD5(指令部分 Key))，IV =
+  count (2 字节) + IV (10 字节)。count 从 0 开始递增，每个数据包加 1；IV 为
+  指令部分 IV 的第 3 至第 12 字节。
   - L - 16 字节：实际数据；
   - 16 字节：Poly1305 认证信息
 
 ## 服务器应答
 
-应答头部数据使用 AES-128-CFB 加密，IV 为 MD5(数据加密 IV)，Key 为 MD5(数据加密 Key)。实际应答数据视加密设置不同而不同。
+应答头部数据使用 AES-128-CFB 加密，IV 为 MD5(数据加密 IV)，Key 为 MD5(数据加密
+Key)。实际应答数据视加密设置不同而不同。
 
 | 1 字节     | 1 字节   | 1 字节   | 1 字节     | M 字节   | 余下部分     |
 | ---------- | -------- | -------- | ---------- | -------- | ------------ |
@@ -155,7 +169,8 @@ VMess 使用非对称格式，即客户端发出的请求和服务器端的响�
 - 实际应答数据：
   - 如果请求中的 Opt(S) 开启，则使用标准格式，否则使用基本格式。
   - 格式均和请求数据相同。
-    - 当 Opt(M) 开启时，长度 L 的值 = 真实值 xor Mask。Mask = (ResponseMask.NextByte() << 8) + ResponseMask.NextByte()；
+    - 当 Opt(M) 开启时，长度 L 的值 = 真实值 xor Mask。Mask =
+      (ResponseMask.NextByte() << 8) + ResponseMask.NextByte()；
 
 ### 动态端口指令
 
@@ -168,7 +183,8 @@ VMess 使用非对称格式，即客户端发出的请求和服务器端的响�
 - 端口 Port：Big Endian 格式的整型端口号；
 - 有效时间 T：分钟数；
 
-客户端在收到动态端口指令时，服务器已开放新的端口用于通信，这时客户端可以将数据发往新的端口。在 T 分钟之后，这个端口将失效，客户端必须重新使用主端口进行通信。
+客户端在收到动态端口指令时，服务器已开放新的端口用于通信，这时客户端可以将数据发往新的端口。在
+T 分钟之后，这个端口将失效，客户端必须重新使用主端口进行通信。
 
 ## 注释
 

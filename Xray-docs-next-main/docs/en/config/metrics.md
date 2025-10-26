@@ -7,48 +7,50 @@ A more straightforward (and hopefully better) way to export metrics.
 It's possible to add a metrics inbound among inbounds.
 
 ```json
-    "inbounds": [
-        {
-            "listen": "127.0.0.1",
-            "port": 11111,
-            "protocol": "dokodemo-door",
-            "settings": {
-                "address": "127.0.0.1"
-            },
-            "tag": "metrics_in"
-        }
-    ]
+"inbounds": [
+    {
+        "listen": "127.0.0.1",
+        "port": 11111,
+        "protocol": "dokodemo-door",
+        "settings": {
+            "address": "127.0.0.1"
+        },
+        "tag": "metrics_in"
+    }
+]
 ```
 
-And add routing rules regarding the metrics inbound in the routing configuration.
+And add routing rules regarding the metrics inbound in the routing
+configuration.
 
 ```json
-    "routing": {
-        "rules": [
-            {
-                "type": "field",
-                "inboundTag": [
-                    "metrics_in"
-                ],
-                "outboundTag": "metrics_out"
-            }
-        ]
-    }
+"routing": {
+    "rules": [
+        {
+            "type": "field",
+            "inboundTag": [
+                "metrics_in"
+            ],
+            "outboundTag": "metrics_out"
+        }
+    ]
+}
 ```
 
 Then finally, enable metrics under the root object.
 
 ```json
-    "metrics": {
-        "tag": "metrics_out"
-    }
+"metrics": {
+    "tag": "metrics_out"
+}
 ```
 
 ## Usage
 
 ### pprof
 
-Access `http://127.0.0.1:11111/debug/pprof/` or use go tool pprof to start profiling or inspect running goroutines.
+Access `http://127.0.0.1:11111/debug/pprof/` or use go tool pprof to start
+profiling or inspect running goroutines.
 
 ### expvars
 
@@ -59,7 +61,9 @@ Variables exported include:
 - `stats` includes statistics about inbounds, outbounds and users
 - `observatory` includes observatory results
 
-for example with [luci-app-xray](https://github.com/yichya/luci-app-xray) you are likely to get a result like this (standard expvar things like `cmdline` and `memstats` are omitted)
+for example with [luci-app-xray](https://github.com/yichya/luci-app-xray) you
+are likely to get a result like this (standard expvar things like `cmdline` and
+`memstats` are omitted)
 
 <details><summary>Click to expand</summary><br>
 
@@ -153,9 +157,12 @@ for example with [luci-app-xray](https://github.com/yichya/luci-app-xray) you ar
 
 </details>
 
-To get a better view of these numbers, [Netdata](https://github.com/netdata/netdata) (with python.d plugin) is a great option:
+To get a better view of these numbers,
+[Netdata](https://github.com/netdata/netdata) (with python.d plugin) is a great
+option:
 
-1. Edit related configuration file (`sudo /etc/netdata/edit-config python.d/go_expvar.conf`)
+1. Edit related configuration file
+   (`sudo /etc/netdata/edit-config python.d/go_expvar.conf`)
 2. Take the following configuration file as an example:
 
 <details><summary>Click to expand</summary><br>
@@ -274,6 +281,7 @@ And you will get a nice plot like this:
 
 ### Additional
 
-Maybe reusing the empty object `stats` in config file is better than adding `metrics` here?
+Maybe reusing the empty object `stats` in config file is better than adding
+`metrics` here?
 
 **Edit:** removed prometheus related things and added usage about expvars

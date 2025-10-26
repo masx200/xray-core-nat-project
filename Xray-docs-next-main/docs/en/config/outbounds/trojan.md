@@ -2,9 +2,8 @@
 
 [Trojan](https://trojan-gfw.github.io/trojan/protocol) protocol
 
-::: danger
-Trojan is designed to work with correctly configured encrypted TLS tunnels.
-:::
+::: danger Trojan is designed to work with correctly configured encrypted TLS
+tunnels. :::
 
 ## OutboundConfigurationObject
 
@@ -24,7 +23,8 @@ Trojan is designed to work with correctly configured encrypted TLS tunnels.
 
 > `servers`: \[ [ServerObject](#serverobject) \]
 
-An array representing a list of servers, where each item is a [ServerObject](#serverobject).
+An array representing a list of servers, where each item is a
+[ServerObject](#serverobject).
 
 ### ServerObject
 
@@ -56,6 +56,8 @@ The email address, optional, used to identify the user.
 
 > `level`: number
 
-The user level. Connections will use the corresponding [local policy](../policy.md#levelpolicyobject) associated with this user level.
+The user level. Connections will use the corresponding
+[local policy](../policy.md#levelpolicyobject) associated with this user level.
 
-The `level` value corresponds to the `level` value in the [policy](../policy.md#policyobject). If not specified, the default value is 0.
+The `level` value corresponds to the `level` value in the
+[policy](../policy.md#policyobject). If not specified, the default value is 0.

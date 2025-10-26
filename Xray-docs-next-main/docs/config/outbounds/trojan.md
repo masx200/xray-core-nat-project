@@ -2,9 +2,7 @@
 
 [Trojan](https://trojan-gfw.github.io/trojan/protocol) 协议
 
-::: danger
-Trojan 被设计工作在正确配置的加密 TLS 隧道
-:::
+::: danger Trojan 被设计工作在正确配置的加密 TLS 隧道 :::
 
 ## OutboundConfigurationObject
 
@@ -36,6 +34,8 @@ Trojan 被设计工作在正确配置的加密 TLS 隧道
 
 > `level`: number
 
-用户等级，连接会使用这个用户等级对应的 [本地策略](../policy.md#levelpolicyobject)。
+用户等级，连接会使用这个用户等级对应的
+[本地策略](../policy.md#levelpolicyobject)。
 
-level 的值, 对应 [policy](../policy.md#policyobject) 中 `level` 的值。 如不指定, 默认为 0。
+level 的值, 对应 [policy](../policy.md#policyobject) 中 `level` 的值。 如不指定,
+默认为 0。

@@ -2,9 +2,8 @@
 
 User-space Wireguard 协议实现。
 
-::: danger
-**Wireguard 协议并非专门为翻墙而设计，若在最外层过墙，存在特征可能导致服务器被封锁**
-:::
+::: danger **Wireguard
+协议并非专门为翻墙而设计，若在最外层过墙，存在特征可能导致服务器被封锁** :::
 
 ## InboundConfigurationObject
 

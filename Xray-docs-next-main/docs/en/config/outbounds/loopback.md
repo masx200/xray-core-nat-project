@@ -1,6 +1,8 @@
 # Loopback
 
-Loopback is an outbound protocol. It can send traffics through corresponding outbound to routing inbound, thus rerouting traffics to other routing rules without leaving Xray-core.
+Loopback is an outbound protocol. It can send traffics through corresponding
+outbound to routing inbound, thus rerouting traffics to other routing rules
+without leaving Xray-core.
 
 ## OutboundConfigurationObject
 
@@ -14,11 +16,16 @@ Loopback is an outbound protocol. It can send traffics through corresponding out
 
 Use as an inbound tag for routing.
 
-This tag can be used as `inboundTag` in routing rules, all traffics going through this outbound can be rerouted with routing rules with corresponding inbound tag.
+This tag can be used as `inboundTag` in routing rules, all traffics going
+through this outbound can be rerouted with routing rules with corresponding
+inbound tag.
 
 ### How to use?
 
-If you need to do some more detailed routing for traffics that have been routed by routing rules, like splitting routed traffics to TCP traffics and UDP traffics and send them to different outbounds, this can be done with `loopback` outbound.
+If you need to do some more detailed routing for traffics that have been routed
+by routing rules, like splitting routed traffics to TCP traffics and UDP
+traffics and send them to different outbounds, this can be done with `loopback`
+outbound.
 
 ```json
 {

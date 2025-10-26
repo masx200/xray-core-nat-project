@@ -36,7 +36,7 @@ body:
     attributes:
       value: |-
         ## Configuration and Log Section
-        
+
         ### For config
         Please provide the configuration files that can reproduce the problem, including the server and client.
         Don't just paste a big exported config file here. Eliminate useless inbound/outbound, rules, options, this can help determine the problem, if you really want to get help.

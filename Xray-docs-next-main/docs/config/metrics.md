@@ -7,15 +7,16 @@
 在基础配置中增加 metrics
 
 ```json
-    "metrics": {
-        "tag": "Metrics",
-        "listen": "127.0.0.1:11111"
-    }
+"metrics": {
+    "tag": "Metrics",
+    "listen": "127.0.0.1:11111"
+}
 ```
 
 > `tag`: string
 
-metrics 对应的出站代理 tag, 通过设置任意门入站+路由将任意门指向此出站即可通过该任意门访问。
+metrics 对应的出站代理 tag,
+通过设置任意门入站+路由将任意门指向此出站即可通过该任意门访问。
 
 > `listen`: string
 
@@ -40,7 +41,8 @@ metrics 对应的出站代理 tag, 通过设置任意门入站+路由将任意�
 - `stats` 包括所有的 inbound outbound user 数据
 - `observatory` 包含了 observatory 观测结果
 
-例如在 [luci-app-xray](https://github.com/yichya/luci-app-xray) 你可以得到这样的输出 (省略了 cmdline 和 memstats 等标准expvar内容)
+例如在 [luci-app-xray](https://github.com/yichya/luci-app-xray)
+你可以得到这样的输出 (省略了 cmdline 和 memstats 等标准expvar内容)
 
 <details><summary>点击查看</summary><br>
 
@@ -134,7 +136,8 @@ metrics 对应的出站代理 tag, 通过设置任意门入站+路由将任意�
 
 </details>
 
-为了得到更好的可视化输出, 可以使用 [Netdata](https://github.com/netdata/netdata) (with python.d plugin):
+为了得到更好的可视化输出, 可以使用 [Netdata](https://github.com/netdata/netdata)
+(with python.d plugin):
 
 1. 编辑相关配置文件 (`sudo /etc/netdata/edit-config python.d/go_expvar.conf`)
 2. 使用下面这样的实力配置:

@@ -1,6 +1,7 @@
 # 设计目标
 
-- Xray 内核提供了一个平台，支持必要的网络代理功能，在其之上可以进二次开发，以提供更好的用户体验；
+- Xray
+  内核提供了一个平台，支持必要的网络代理功能，在其之上可以进二次开发，以提供更好的用户体验；
 - 以跨平台为首要原则，以减少二次开发的成本；
 
 ## 架构
@@ -32,11 +33,15 @@
 
 #### 入站代理
 
-- 实现 [proxy.Inbound](https://github.com/xtls/Xray-core/blob/main/proxy/proxy.go) 接口；
+- 实现
+  [proxy.Inbound](https://github.com/xtls/Xray-core/blob/main/proxy/proxy.go)
+  接口；
 
 #### 出站代理
 
-- 实现 [proxy.Outbound](https://github.com/xtls/Xray-core/blob/main/proxy/proxy.go) 接口；
+- 实现
+  [proxy.Outbound](https://github.com/xtls/Xray-core/blob/main/proxy/proxy.go)
+  接口；
 
 ### 传输层
 

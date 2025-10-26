@@ -1,10 +1,11 @@
 # FakeDNS
 
-FakeDNS is used to obtain target domain names by forging DNS, which can reduce the delay in DNS queries and work with transparent proxies to obtain target domain names.
+FakeDNS is used to obtain target domain names by forging DNS, which can reduce
+the delay in DNS queries and work with transparent proxies to obtain target
+domain names.
 
-::: warning
-FakeDNS may contaminate the local DNS and cause "network unreachable" after Xray is closed.
-:::
+::: warning FakeDNS may contaminate the local DNS and cause "network
+unreachable" after Xray is closed. :::
 
 ## FakeDNSObject
 
@@ -17,7 +18,9 @@ FakeDNS may contaminate the local DNS and cause "network unreachable" after Xray
 }
 ```
 
-`FakeDnsObject` can also be configured as an array containing multiple FakeIP Pools. When a DNS query request is received, FakeDNS returns a group of FakeIPs obtained by multiple FakeIP Pools at the same time.
+`FakeDnsObject` can also be configured as an array containing multiple FakeIP
+Pools. When a DNS query request is received, FakeDNS returns a group of FakeIPs
+obtained by multiple FakeIP Pools at the same time.
 
 ```json
 [
@@ -38,16 +41,19 @@ FakeDNS will use the IP block specified by this option to allocate addresses.
 
 > `poolSize`: int
 
-Specifies the maximum number of domain name-IP mappings stored by FakeDNS. When the number of mappings exceeds this value, mappings will be eliminated according to the LRU rule. The default is 65535.
+Specifies the maximum number of domain name-IP mappings stored by FakeDNS. When
+the number of mappings exceeds this value, mappings will be eliminated according
+to the LRU rule. The default is 65535.
 
-::: warning
-`poolSize` must be less than or equal to the total number of addresses corresponding to `ipPool`.
-:::
+::: warning `poolSize` must be less than or equal to the total number of
+addresses corresponding to `ipPool`. :::
 
-::: tip
-If the `dns` item in the configuration file sets `fakedns`, but the configuration file does not set `FakeDNSObject`, Xray will initialize `FakeDNSObject` based on the `queryStrategy` of the DNS component.
+::: tip If the `dns` item in the configuration file sets `fakedns`, but the
+configuration file does not set `FakeDNSObject`, Xray will initialize
+`FakeDNSObject` based on the `queryStrategy` of the DNS component.
 
-When `queryStrategy` is set to `UseIP`, the initialized FakeIP Pool is equivalent to
+When `queryStrategy` is set to `UseIP`, the initialized FakeIP Pool is
+equivalent to
 
 ```json
 [
@@ -62,7 +68,8 @@ When `queryStrategy` is set to `UseIP`, the initialized FakeIP Pool is equivalen
 ]
 ```
 
-When `queryStrategy` is set to `UseIPv4`, the initialized FakeIP Pool is equivalent to
+When `queryStrategy` is set to `UseIPv4`, the initialized FakeIP Pool is
+equivalent to
 
 ```json
 {
@@ -71,7 +78,8 @@ When `queryStrategy` is set to `UseIPv4`, the initialized FakeIP Pool is equival
 }
 ```
 
-When `queryStrategy` is set to `UseIPv6`, the initialized FakeIP Pool is equivalent to
+When `queryStrategy` is set to `UseIPv6`, the initialized FakeIP Pool is
+equivalent to
 
 ```json
 {
@@ -84,7 +92,8 @@ When `queryStrategy` is set to `UseIPv6`, the initialized FakeIP Pool is equival
 
 ### How to use?
 
-FakeDNS is essentially a [DNS server](./dns.md#serverobject) that can be used in conjunction with any DNS rules.
+FakeDNS is essentially a [DNS server](./dns.md#serverobject) that can be used in
+conjunction with any DNS rules.
 
 Only by routing DNS queries to FakeDNS can it be effective.
 
@@ -115,9 +124,13 @@ Only by routing DNS queries to FakeDNS can it be effective.
 }
 ```
 
-When external DNS requests enter the FakeDNS component, it will return IP addresses within its own `ipPool` as the virtual resolution results of the domain name, and record the mapping relationship between the domain name and the virtual resolution results.
+When external DNS requests enter the FakeDNS component, it will return IP
+addresses within its own `ipPool` as the virtual resolution results of the
+domain name, and record the mapping relationship between the domain name and the
+virtual resolution results.
 
-In addition, you need to enable `Sniffing` in the **client** for incoming traffic that needs to be proxied, and use the `fakedns` target address reset.
+In addition, you need to enable `Sniffing` in the **client** for incoming
+traffic that needs to be proxied, and use the `fakedns` target address reset.
 
 ```json
 "sniffing": {
@@ -127,15 +140,15 @@ In addition, you need to enable `Sniffing` in the **client** for incoming traffi
 }
 ```
 
-::: warning
-If the FakeIP is not correctly restored to the domain name, the server will not be accessible.
-:::
+::: warning If the FakeIP is not correctly restored to the domain name, the
+server will not be accessible. :::
 
 ### Using with other types of DNS
 
 #### Coexistence with DNS shunting
 
-When using DNS shunting, to give `fakedns` a higher priority, you need to add the same `domains` as other types of DNS.
+When using DNS shunting, to give `fakedns` a higher priority, you need to add
+the same `domains` as other types of DNS.
 
 ```json
 {
@@ -164,7 +177,10 @@ When using DNS shunting, to give `fakedns` a higher priority, you need to add th
 
 #### FakeDNS blacklist
 
-If you do not want certain domain names to use FakeDNS, you can add `domains` configuration in other types of DNS configurations so that when the specified domain names are matched, other DNS servers have a higher priority than FakeDNS, thereby achieving the FakeDNS blacklist mechanism.
+If you do not want certain domain names to use FakeDNS, you can add `domains`
+configuration in other types of DNS configurations so that when the specified
+domain names are matched, other DNS servers have a higher priority than FakeDNS,
+thereby achieving the FakeDNS blacklist mechanism.
 
 ```json
 {
@@ -180,7 +196,10 @@ If you do not want certain domain names to use FakeDNS, you can add `domains` co
 
 #### FakeDNS whitelist
 
-If you only want certain domain names to use FakeDNS, you can add `domains` configuration to `fakedns` so that when the specified domain names are matched, `fakedns` has a higher priority than other DNS servers, thereby achieving the FakeDNS whitelist mechanism.
+If you only want certain domain names to use FakeDNS, you can add `domains`
+configuration to `fakedns` so that when the specified domain names are matched,
+`fakedns` has a higher priority than other DNS servers, thereby achieving the
+FakeDNS whitelist mechanism.
 
 ```json
 {

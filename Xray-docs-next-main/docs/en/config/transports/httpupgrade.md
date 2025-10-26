@@ -1,16 +1,21 @@
 # HTTPUpgrade
 
-A WebSocket-like transport protocol implementing the HTTP/1.1 upgrade and response, allowing it to be reverse proxied by web servers or CDNs just like WebSocket, but without the need to implement the remaining portions of the WebSocket protocol, yielding better performance.
+A WebSocket-like transport protocol implementing the HTTP/1.1 upgrade and
+response, allowing it to be reverse proxied by web servers or CDNs just like
+WebSocket, but without the need to implement the remaining portions of the
+WebSocket protocol, yielding better performance.
 
-Standalone usage is not recommended, but rather in conjunction with other security protocols like TLS.
+Standalone usage is not recommended, but rather in conjunction with other
+security protocols like TLS.
 
-::: danger
-**It is recommended to switch to [XHTTP](https://github.com/XTLS/Xray-core/discussions/4113) to avoid significant traffic characteristics such as HTTPUpgrade "ALPN is http/1.1".**
-:::
+::: danger **It is recommended to switch to
+[XHTTP](https://github.com/XTLS/Xray-core/discussions/4113) to avoid significant
+traffic characteristics such as HTTPUpgrade "ALPN is http/1.1".** :::
 
 ## HttpUpgradeObject
 
-The `HttpUpgradeObject` corresponds to the `httpupgradeSettings` section under transport configurations.
+The `HttpUpgradeObject` corresponds to the `httpupgradeSettings` section under
+transport configurations.
 
 ```json
 {
@@ -27,25 +32,37 @@ The `HttpUpgradeObject` corresponds to the `httpupgradeSettings` section under t
 
 For inbounds only. Specifies whether to accept the PROXY protocol.
 
-The [PROXY protocol](https://www.haproxy.org/download/2.2/doc/proxy-protocol.txt) is used to pass the real IP address and port of a connection along. **Ignore it if you have no knowledge regarding this**.
+The
+[PROXY protocol](https://www.haproxy.org/download/2.2/doc/proxy-protocol.txt) is
+used to pass the real IP address and port of a connection along. **Ignore it if
+you have no knowledge regarding this**.
 
-Common reverse proxies (e.g. HAProxy, NGINX) and VLESS fallbacks xver can be configured for its inclusion.
+Common reverse proxies (e.g. HAProxy, NGINX) and VLESS fallbacks xver can be
+configured for its inclusion.
 
-When `true`, the downstream must first send PROXY protocol version 1 or 2 after establishing the underlying TCP connection, or the connection will be closed.
+When `true`, the downstream must first send PROXY protocol version 1 or 2 after
+establishing the underlying TCP connection, or the connection will be closed.
 
 > `path`: string
 
 HTTP path used by the HTTPUpgrade connection. Defaults to `"/"`.
 
-If the `path` property include an `ed` query field (e.g. `/mypath?ed=2560`), "early data" will be used to decrease latency, with the value defining the threshold of the first packet's size. If the size of the first packet exceeds the defined value, "early data" will not be applied. The recommended value is `2560`.
+If the `path` property include an `ed` query field (e.g. `/mypath?ed=2560`),
+"early data" will be used to decrease latency, with the value defining the
+threshold of the first packet's size. If the size of the first packet exceeds
+the defined value, "early data" will not be applied. The recommended value is
+`2560`.
 
 > `host`: string
 
-HTTP Host sent by the HTTPUpgrade connection. Empty by default. If this value is empty on the server, the host header sent by clients will not be validated.
+HTTP Host sent by the HTTPUpgrade connection. Empty by default. If this value is
+empty on the server, the host header sent by clients will not be validated.
 
-If the `Host` header has been defined on the server in any way, the server will validate if the `Host` header matches.
+If the `Host` header has been defined on the server in any way, the server will
+validate if the `Host` header matches.
 
-The current priority of the `Host` header sent by clients: `host` > `headers` > `address`
+The current priority of the `Host` header sent by clients: `host` > `headers` >
+`address`
 
 > `headers`: map \{string: string\}
 

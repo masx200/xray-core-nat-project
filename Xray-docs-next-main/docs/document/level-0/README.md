@@ -2,9 +2,7 @@
 
 **这个章节是【从零开始】的基础课，新来的同学好好看好好学哦**
 
-::: tip
-Made with ❤️ by [@ricuhkaen](https://github.com/ricuhkaen)
-:::
+::: tip Made with ❤️ by [@ricuhkaen](https://github.com/ricuhkaen) :::
 
 [【第 1 章】 前言罗嗦篇](./ch01-preface.md) - 机场还是自建？这是个问题
 

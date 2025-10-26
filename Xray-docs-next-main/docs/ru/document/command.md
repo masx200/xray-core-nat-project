@@ -1,12 +1,11 @@
 # Командные аргументы
 
-::: tip
-Xray использует команды и аргументы в стиле Go.
-:::
+::: tip Xray использует команды и аргументы в стиле Go. :::
 
 ## Базовые команды
 
-Вы можете запустить `xray help`, чтобы получить список всех базовых команд Xray, а также их описание и примеры использования.
+Вы можете запустить `xray help`, чтобы получить список всех базовых команд Xray,
+а также их описание и примеры использования.
 
 ```
 Xray is a platform for building proxies.
@@ -27,9 +26,8 @@ The commands are:
         mldsa65      Сгенерировать ключевую пару для постквантовой подписи ML-DSA-65 (REALITY)
         mlkem768     Сгенерировать ключевую пару для постквантового обмена ключами ML-KEM-768 (VLESS Encryption)
         vlessenc     Сгенерировать пару json для дешифрования/шифрования (VLESS Encryption)
-        
-Use "xray help <command>" for more information about a command.
 
+Use "xray help <command>" for more information about a command.
 ```
 
 ### xray run
@@ -39,7 +37,7 @@ Use "xray help <command>" for more information about a command.
 Использование:
 
 ```
- xray run [-c config.json] [-confdir dir]
+xray run [-c config.json] [-confdir dir]
 ```
 
 ```
@@ -59,24 +57,25 @@ without launching the server.
 The -dump flag tells Xray to print the merged config.
 ```
 
-`-config=` / `-c=`: Указывает путь к файлу конфигурации, поддерживается использование нескольких файлов.
-`-confdir=`: Указывает путь к папке, содержащей несколько файлов конфигурации.
-`-format=`: Задает формат файлов конфигурации.
-`-test`: Проверяет корректность файлов конфигурации.
-`-dump`: Выводит объединенный результат слияния нескольких файлов конфигурации.
+`-config=` / `-c=`: Указывает путь к файлу конфигурации, поддерживается
+использование нескольких файлов. `-confdir=`: Указывает путь к папке, содержащей
+несколько файлов конфигурации. `-format=`: Задает формат файлов конфигурации.
+`-test`: Проверяет корректность файлов конфигурации. `-dump`: Выводит
+объединенный результат слияния нескольких файлов конфигурации.
 
-::: tip
-Помимо формата JSON по умолчанию, файлы конфигурации также могут быть в формате TOML или YAML. Если формат не указан явно, он определяется по расширению файла.
-:::
+::: tip Помимо формата JSON по умолчанию, файлы конфигурации также могут быть в
+формате TOML или YAML. Если формат не указан явно, он определяется по расширению
+файла. :::
 
-::: tip
-Когда `-config` не указан, Xray последовательно попытается загрузить `config.json` из следующих путей:
+::: tip Когда `-config` не указан, Xray последовательно попытается загрузить
+`config.json` из следующих путей:
+
 - Рабочий каталог (Working Directory)
-- Путь, указанный в переменной окружения `Xray.location.asset` в [переменных окружения](../config/features/env.md#Путь-к-файлам-ресурсов)
-:::
+- Путь, указанный в переменной окружения `Xray.location.asset` в
+  [переменных окружения](../config/features/env.md#Путь-к-файлам-ресурсов) :::
 
 ```
- xray run -dump
+xray run -dump
 ```
 
 Выводит результат слияния нескольких файлов конфигурации.
@@ -88,7 +87,7 @@ The -dump flag tells Xray to print the merged config.
 Использование:
 
 ```
- xray version
+xray version
 ```
 
 ### xray api
@@ -102,14 +101,14 @@ xray api <command> [arguments]
 ```
 
 ```
-        restartlogger Restart the logger
-        stats         Get statistics
-        statsquery    Query statistics
-        statssys      Get system statistics
-        adi           Add inbounds
-        ado           Add outbounds
-        rmi           Remove inbounds
-        rmo           Remove outbounds
+restartlogger Restart the logger
+stats         Get statistics
+statsquery    Query statistics
+statssys      Get system statistics
+adi           Add inbounds
+ado           Add outbounds
+rmi           Remove inbounds
+rmo           Remove outbounds
 ```
 
 ### xray convert
@@ -178,9 +177,9 @@ xray tls <command> [arguments]
 ```
 
 ```
-        cert          Generate TLS certificates
-        ping          Ping the domain with TLS handshake
-        certChainHash Calculate TLS certificates hash.
+cert          Generate TLS certificates
+ping          Ping the domain with TLS handshake
+certChainHash Calculate TLS certificates hash.
 ```
 
 ### xray uuid
@@ -213,16 +212,17 @@ xray x25519 [-i "(base64.RawURLEncoding)" --std-encoding ]
 xray wg [-i "(base64.StdEncoding)"]
 ```
 
-::: tip
-Если `-config` не указан, Xray попытается загрузить `config.json` из следующих мест:
+::: tip Если `-config` не указан, Xray попытается загрузить `config.json` из
+следующих мест:
 
 - Рабочий каталог (Working Directory);
-- Путь, указанный в переменной окружения `Xray.location.asset` (см. [Переменные окружения](../config/features/env.md#ресурсные-файлы)).
-  :::
+- Путь, указанный в переменной окружения `Xray.location.asset` (см.
+  [Переменные окружения](../config/features/env.md#ресурсные-файлы)). :::
 
 ### xray mldsa65
 
-Генерирует пару ключей для постквантовой подписи MLDSA-65, используемой в REALITY.
+Генерирует пару ключей для постквантовой подписи MLDSA-65, используемой в
+REALITY.
 
 Использование:
 
@@ -232,7 +232,8 @@ xray mldsa65 [-i "seed (base64.StdEncoding)"]
 
 ### xray mlkem768
 
-Генерирует пару ключей для постквантового обмена ключами ML-KEM-768, используемую в VLESS Encryption.
+Генерирует пару ключей для постквантового обмена ключами ML-KEM-768,
+используемую в VLESS Encryption.
 
 Использование:
 
@@ -242,7 +243,12 @@ xray mlkem768 [-i "seed (base64.StdEncoding)"]
 
 ### xray vlessenc
 
-Генерирует содержимое опций `encryption`/`decryption`, которые могут быть непосредственно использованы в VLESS Encryption. В сгенерированной конфигурации достаточно использовать один из двух методов аутентификации: X25519 или ML-KEM-768, но сервер и клиент должны использовать один и тот же метод аутентификации. Обмен временными ключами остается постквантово безопасным, независимо от метода аутентификации.
+Генерирует содержимое опций `encryption`/`decryption`, которые могут быть
+непосредственно использованы в VLESS Encryption. В сгенерированной конфигурации
+достаточно использовать один из двух методов аутентификации: X25519 или
+ML-KEM-768, но сервер и клиент должны использовать один и тот же метод
+аутентификации. Обмен временными ключами остается постквантово безопасным,
+независимо от метода аутентификации.
 
 Использование:
 

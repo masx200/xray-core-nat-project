@@ -1,14 +1,18 @@
 <!-- OPENSPEC:START -->
+
 # OpenSpec Instructions
 
 These instructions are for AI assistants working in this project.
 
 Always open `@/openspec/AGENTS.md` when the request:
+
 - Mentions planning or proposals (words like proposal, spec, change, plan)
-- Introduces new capabilities, breaking changes, architecture shifts, or big performance/security work
+- Introduces new capabilities, breaking changes, architecture shifts, or big
+  performance/security work
 - Sounds ambiguous and you need the authoritative spec before coding
 
 Use `@/openspec/AGENTS.md` to learn:
+
 - How to create and apply change proposals
 - Spec format and conventions
 - Project structure and guidelines
@@ -19,11 +23,13 @@ Keep this managed block so 'openspec update' can refresh the instructions.
 
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to Claude Code (claude.ai/code) when working with
+code in this repository.
 
 ## 项目概述
 
-这是一个包含 Xray-core 和 Xray-docs-next 的项目仓库。Xray-core 是一个网络代理平台的核心实现，支持多种代理协议；Xray-docs-next 是其文档网站。
+这是一个包含 Xray-core 和 Xray-docs-next 的项目仓库。Xray-core
+是一个网络代理平台的核心实现，支持多种代理协议；Xray-docs-next 是其文档网站。
 
 ## 项目结构
 
@@ -47,6 +53,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Xray-core 架构
 
 ### 核心组件
+
 - **main/**: 程序入口点，包含命令行接口和配置加载
 - **core/**: Xray 实例管理，依赖注入和功能注册
 - **app/**: 应用层服务
@@ -68,6 +75,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
   - 各种传输协议（TCP、UDP、WebSocket、QUIC等）
 
 ### 配置系统
+
 - 配置文件支持 JSON、YAML、TOML 格式
 - 使用 Protocol Buffers 定义配置结构
 - 配置验证和自动加载机制
@@ -75,6 +83,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## 常用开发命令
 
 ### Xray-core 编译
+
 ```bash
 # 进入核心目录
 cd Xray-core-main
@@ -91,6 +100,7 @@ CGO_ENABLED=0 go build -o xray -trimpath -buildvcs=false -gcflags="all=-l=4" -ld
 ```
 
 ### 测试
+
 ```bash
 # 运行所有测试
 go test -timeout 1h -v ./...
@@ -105,6 +115,7 @@ go tool cover -html=coverage.out
 ```
 
 ### Xray-docs 开发
+
 ```bash
 # 进入文档目录
 cd Xray-docs-next-main
@@ -128,6 +139,7 @@ npm run lint
 ## 开发工作流
 
 ### 添加新功能
+
 1. 在相应的包中实现功能接口
 2. 在 `core/` 中注册新功能
 3. 在 `features/` 中定义功能接口
@@ -135,6 +147,7 @@ npm run lint
 5. 编写单元测试
 
 ### 添加新代理协议
+
 1. 在 `proxy/` 下创建新目录
 2. 实现 `proxy.Inbound` 和 `proxy.Outbound` 接口
 3. 添加配置结构定义
@@ -142,6 +155,7 @@ npm run lint
 5. 编写集成测试
 
 ### 调试技巧
+
 - 使用 `go test -v` 查看详细测试输出
 - 使用 `delve` 进行断点调试
 - 查看日志输出来诊断问题

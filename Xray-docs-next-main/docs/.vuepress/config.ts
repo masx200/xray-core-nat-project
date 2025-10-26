@@ -1,7 +1,7 @@
 import { viteBundler } from "@vuepress/bundler-vite";
 import { webpackBundler } from "@vuepress/bundler-webpack";
 // import { UserConfig, defineUserConfig } from "@vuepress/cli";
-import { UserConfig, defineUserConfig } from "vuepress/cli";
+import { defineUserConfig, UserConfig } from "vuepress/cli";
 import { searchPlugin } from "@vuepress/plugin-search";
 import markdownItFootnote from "markdown-it-footnote";
 import theme from "./theme.js";

@@ -4,12 +4,13 @@ title: 流量统计
 
 # 流量统计配置教程
 
-请熟悉[流量统计 白话文教程](https://guide.v2fly.org/advanced/traffic.html)，本文在其基础上适配了 Xray（1.5.9+）。
+请熟悉[流量统计 白话文教程](https://guide.v2fly.org/advanced/traffic.html)，本文在其基础上适配了
+Xray（1.5.9+）。
 
 ## 查看流量信息
 
-配置方法与 v2fly 一致。
-查看流量信息是 xray 命令行的其中一个功能。配置内设置的 api dokodemo-door 端口，即为 `--server` 参数的端口。
+配置方法与 v2fly 一致。 查看流量信息是 xray 命令行的其中一个功能。配置内设置的
+api dokodemo-door 端口，即为 `--server` 参数的端口。
 
 ```bash
 xray api statsquery --server=127.0.0.1:10085 #查看所有流量
@@ -60,7 +61,8 @@ xray help api stats #stats 查询一个记录
 
 ## 流量信息的处理
 
-把以下脚本保存到 `traffic.sh`，注意使用 `chmod 755 traffic.sh` 授予执行权限。注意调整修改 `_APISERVER` 一行的连接具体的端口参数。
+把以下脚本保存到 `traffic.sh`，注意使用 `chmod 755 traffic.sh`
+授予执行权限。注意调整修改 `_APISERVER` 一行的连接具体的端口参数。
 
 ```bash
 #!/bin/bash

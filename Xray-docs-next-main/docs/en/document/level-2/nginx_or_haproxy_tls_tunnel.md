@@ -2,7 +2,9 @@
 title: Nginx 或 Haproxy 搭建 TLS 隧道隐藏指纹
 ---
 
-Nginx 或 Haproxy 实现的 HTTPS 隧道、HTTP/2 over HTTPS 隧道、WebSocket over HTTP/2 over HTTPS 隧道、gRPC over HTTP/2 over HTTPS 隧道以及自签证书双端认证的 gRPC over HTTP/2 over HTTPS 隧道
+Nginx 或 Haproxy 实现的 HTTPS 隧道、HTTP/2 over HTTPS 隧道、WebSocket over
+HTTP/2 over HTTPS 隧道、gRPC over HTTP/2 over HTTPS 隧道以及自签证书双端认证的
+gRPC over HTTP/2 over HTTPS 隧道
 
 # 客户端服务端 Nginx 构建 HTTPS 隧道隐藏指纹
 
@@ -22,7 +24,8 @@ xray_client ---tcp--- nginx_client ---HTTPS--- nginx_sever ---tcp--- xray_server
 
 `apt install gcc make` //编译依赖 gcc 以及 make
 
-`./configure --prefix=/usr/local/nginx --with-http_ssl_module --with-http_v2_module --with-stream --with-stream_ssl_module` //此步需要依赖一些库，根据报错安装相应 lib
+`./configure --prefix=/usr/local/nginx --with-http_ssl_module --with-http_v2_module --with-stream --with-stream_ssl_module`
+//此步需要依赖一些库，根据报错安装相应 lib
 
 `make && make install`
 
@@ -53,8 +56,8 @@ stream {
 
 ::: warning 注意
 
-stream 部分与 http 模块并列，客户端可删除 http 部分，服务端可删除或搭建网页伪装回落
-:::
+stream 部分与 http 模块并列，客户端可删除 http
+部分，服务端可删除或搭建网页伪装回落 :::
 
 客户端加入如下配置
 
@@ -106,38 +109,35 @@ WantedBy=multi-user.target
 
 ```json
 {
-	"log": {
-		"loglevel": "none"
-	},
-	"inbounds": [
-		{
-			"listen": "/dev/shm/vless.sock,0666",
-			"protocol": "vless",
-			"settings": {
-				"clients": [
-					{
-						"id": "uuid"
-					}
-				],
-				"decryption": "none"
-			},
-			"streamSettings": {
-				"network": "tcp"
-			},
-			"sniffing": {
-				"enabled": true,
-				"destOverride": [
-					"http",
-					"tls"
-				]
-			}
-		}
-	],
-	"outbounds": [
-		{
-			"protocol": "freedom"
-		}
-	]
+  "log": {
+    "loglevel": "none"
+  },
+  "inbounds": [
+    {
+      "listen": "/dev/shm/vless.sock,0666",
+      "protocol": "vless",
+      "settings": {
+        "clients": [
+          {
+            "id": "uuid"
+          }
+        ],
+        "decryption": "none"
+      },
+      "streamSettings": {
+        "network": "tcp"
+      },
+      "sniffing": {
+        "enabled": true,
+        "destOverride": ["http", "tls"]
+      }
+    }
+  ],
+  "outbounds": [
+    {
+      "protocol": "freedom"
+    }
+  ]
 }
 ```
 
@@ -145,160 +145,138 @@ WantedBy=multi-user.target
 
 ```json
 {
-    "log": {
-        "loglevel": "none"
-    },
-    "dns": {
-        "servers": [
-            "1.1.1.1",
-            {
-                "address": "119.29.29.29",
-                "domains": [
-                    "geosite:cn"
-                ],
-                "expectIP": [
-                    "geoip:cn"
-                ]
-            }
-        ],
-        "disableFallback": true,
-        "disableFallbackIfMatch": true
-    },
-    "inbounds": [
-        {
-            "tag": "tproxy-in",
-            "port": 12345,
-            "protocol": "dokodemo-door",
-            "settings": {
-                "network": "tcp,udp",
-                "followRedirect": true
-            },
-            "sniffing": {
-                "enabled": true,
-                "destOverride": [
-                    "http",
-                    "tls"
-                ]
-            },
-            "streamSettings": {
-                "sockopt": {
-                    "tproxy": "tproxy",
-                    "mark": 255
-                }
-            }
-        },
-        {
-            "tag": "http",
-            "port": 10808,
-            "listen": "127.0.0.1",
-            "protocol": "http",
-            "sniffing": {
-                "enabled": true,
-                "destOverride": [
-                    "http",
-                    "tls"
-                ]
-            }
-        }
+  "log": {
+    "loglevel": "none"
+  },
+  "dns": {
+    "servers": [
+      "1.1.1.1",
+      {
+        "address": "119.29.29.29",
+        "domains": ["geosite:cn"],
+        "expectIP": ["geoip:cn"]
+      }
     ],
-    "outbounds": [
-        {
-            "tag": "nginxtls",
-            "protocol": "vless",
-            "settings": {
-                "vnext": [
-                    {
-                        "address": "127.0.0.1",
-                        "port": 6666,
-                        "users": [
-                            {
-                                "id": "uuid",
-                                "encryption": "none"
-                            }
-                        ]
-                    }
-                ]
-            },
-            "streamSettings": {
-                "sockopt": {
-                    "mark": 255
-                },
-                "network": "tcp"
-            }
-        },
-        {
-            "tag": "direct",
-            "protocol": "freedom",
-            "streamSettings": {
-                "sockopt": {
-                    "mark": 255
-                }
-            }
-        },
-        {
-            "tag": "block",
-            "protocol": "blackhole",
-            "settings": {
-                "response": {
-                    "type": "http"
-                }
-            }
+    "disableFallback": true,
+    "disableFallbackIfMatch": true
+  },
+  "inbounds": [
+    {
+      "tag": "tproxy-in",
+      "port": 12345,
+      "protocol": "dokodemo-door",
+      "settings": {
+        "network": "tcp,udp",
+        "followRedirect": true
+      },
+      "sniffing": {
+        "enabled": true,
+        "destOverride": ["http", "tls"]
+      },
+      "streamSettings": {
+        "sockopt": {
+          "tproxy": "tproxy",
+          "mark": 255
         }
-    ],
-    "routing": {
-        "domainMatcher": "mph",
-        "domainStrategy": "AsIs",
-        "rules": [
-            {
-                "type": "field",
-                "domain": [
-                    "geosite:category-ads-all"
-                ],
-                "outboundTag": "block"
-            },
-            {
-                "type": "field",
-                "port": 123,
-                "network": "udp",
-                "outboundTag": "direct"
-            },
-            {
-                "type": "field",
-                "ip": [
-                    "1.1.1.1"
-                ],
-                "outboundTag": "proxy"
-            },
-            {
-                "type": "field",
-                "domain": [
-                    "geosite:cn"
-                ],
-                "outboundTag": "direct"
-            },
-            {
-                "type": "field",
-                "protocol": [
-                    "bittorrent"
-                ],
-                "outboundTag": "direct"
-            },
-            {
-                "type": "field",
-                "ip": [
-                    "geoip:private"
-                ],
-                "outboundTag": "direct"
-            },
-            {
-                "type": "field",
-                "inboundTag": [
-                    "tproxy-in"
-                ],
-                "outboundTag": "nginxtls"
-            }
-        ]
+      }
+    },
+    {
+      "tag": "http",
+      "port": 10808,
+      "listen": "127.0.0.1",
+      "protocol": "http",
+      "sniffing": {
+        "enabled": true,
+        "destOverride": ["http", "tls"]
+      }
     }
+  ],
+  "outbounds": [
+    {
+      "tag": "nginxtls",
+      "protocol": "vless",
+      "settings": {
+        "vnext": [
+          {
+            "address": "127.0.0.1",
+            "port": 6666,
+            "users": [
+              {
+                "id": "uuid",
+                "encryption": "none"
+              }
+            ]
+          }
+        ]
+      },
+      "streamSettings": {
+        "sockopt": {
+          "mark": 255
+        },
+        "network": "tcp"
+      }
+    },
+    {
+      "tag": "direct",
+      "protocol": "freedom",
+      "streamSettings": {
+        "sockopt": {
+          "mark": 255
+        }
+      }
+    },
+    {
+      "tag": "block",
+      "protocol": "blackhole",
+      "settings": {
+        "response": {
+          "type": "http"
+        }
+      }
+    }
+  ],
+  "routing": {
+    "domainMatcher": "mph",
+    "domainStrategy": "AsIs",
+    "rules": [
+      {
+        "type": "field",
+        "domain": ["geosite:category-ads-all"],
+        "outboundTag": "block"
+      },
+      {
+        "type": "field",
+        "port": 123,
+        "network": "udp",
+        "outboundTag": "direct"
+      },
+      {
+        "type": "field",
+        "ip": ["1.1.1.1"],
+        "outboundTag": "proxy"
+      },
+      {
+        "type": "field",
+        "domain": ["geosite:cn"],
+        "outboundTag": "direct"
+      },
+      {
+        "type": "field",
+        "protocol": ["bittorrent"],
+        "outboundTag": "direct"
+      },
+      {
+        "type": "field",
+        "ip": ["geoip:private"],
+        "outboundTag": "direct"
+      },
+      {
+        "type": "field",
+        "inboundTag": ["tproxy-in"],
+        "outboundTag": "nginxtls"
+      }
+    ]
+  }
 }
 ```
 
@@ -340,7 +318,8 @@ Haproxy 处理 ssl 需要 openssl 支持，检查 openssl 版本，必要时安�
 
 网路结构：
 
-xray_client ---tcp--- haproxy_client ---HTTPS--- haproxy_sever ---tcp--- xray_server
+xray_client ---tcp--- haproxy_client ---HTTPS--- haproxy_sever ---tcp---
+xray_server
 
 ### haproxy_client 配置 (运行前去掉注释)
 
@@ -413,7 +392,8 @@ backend web
 
 ### xray 配置
 
-同上 nginx 部分：最简单的 TCP 配置，可搭配任意协议，建议使用 VLESS+TCP 无需多余加密，参考文档或其他示例
+同上 nginx 部分：最简单的 TCP 配置，可搭配任意协议，建议使用 VLESS+TCP
+无需多余加密，参考文档或其他示例
 
 ## WebSocket over HTTP/2
 
@@ -421,13 +401,17 @@ Haproxy 支持 HTTP/2 的 h2c 进站及出站
 
 然而援引 xray 文档 HTTP/2 的说明
 
-“由 HTTP/2 的建议，客户端和服务器必须同时开启 TLS 才可以正常使用这个传输方式。...... 当前版本的 HTTP/2 的传输方式并不强制要求入站（服务端）有 TLS 配置。”
+“由 HTTP/2 的建议，客户端和服务器必须同时开启 TLS
+才可以正常使用这个传输方式。...... 当前版本的 HTTP/2
+的传输方式并不强制要求入站（服务端）有 TLS 配置。”
 
-即入站可以使用 h2c，出站并不支持 h2c。因此无法使用 xray_client ---h2c--- haproxy_client ---HTTP/2+TLS--- haproxy_sever ---h2c--- xray_server
+即入站可以使用 h2c，出站并不支持 h2c。因此无法使用 xray_client ---h2c---
+haproxy_client ---HTTP/2+TLS--- haproxy_sever ---h2c--- xray_server
 
 但是可以通过 ws 偷个鸡，Haproxy 支持 ws over HTTP/2
 
-则网络结构：xray_client ---ws--- haproxy_client ---ws over HTTP/2 over HTTPS--- haproxy_sever ---ws--- xray_server
+则网络结构：xray_client ---ws--- haproxy_client ---ws over HTTP/2 over HTTPS---
+haproxy_sever ---ws--- xray_server
 
 ### haproxy_client 配置
 
@@ -517,13 +501,16 @@ backend web
 
 ### xray 配置
 
-简单的 websocket 配置即可，无需 TLS， 配置见 xray 文档示例，配置 "path" 可以用于服务端 haproxy 分流（客户端有分流需求同样可以通过客户端 haproxy 进行，原理类似，参考服务端的 path 分流配置）
+简单的 websocket 配置即可，无需 TLS， 配置见 xray 文档示例，配置 "path"
+可以用于服务端 haproxy 分流（客户端有分流需求同样可以通过客户端 haproxy
+进行，原理类似，参考服务端的 path 分流配置）
 
 ## gRPC over HTTP/2
 
 虽然双端的 h2c 不行，但是 gRPC 不要求必须 TLS，直接冲
 
-网络结构：xray_client ---gRPC h2c--- haproxy_client ---gRPC over HTTP/2 over HTTPS--- haproxy_sever ---gRPC h2c--- xray_server
+网络结构：xray_client ---gRPC h2c--- haproxy_client ---gRPC over HTTP/2 over
+HTTPS--- haproxy_sever ---gRPC h2c--- xray_server
 
 ### haproxy_client 配置
 
@@ -613,17 +600,22 @@ backend web
 
 # Haproxy 使用自签证书进行双端认证（gRPC 示例）
 
-这里使用自签证书双端认证加强隧道安全性（但会牺牲一点延迟，不过使用 gRPC 后感知不强），而服务端同时处理信任的证书和自签名证书，并据此分流伪装网站和隧道流量
+这里使用自签证书双端认证加强隧道安全性（但会牺牲一点延迟，不过使用 gRPC
+后感知不强），而服务端同时处理信任的证书和自签名证书，并据此分流伪装网站和隧道流量
 
 其中 www.example.com 为伪装站信任证书（如白话文中申请的证书）
 
-tunnel.example.com 为自签证书网址，自签证书可以参考 https://learn.microsoft.com/zh-cn/azure/application-gateway/self-signed-certificates
+tunnel.example.com 为自签证书网址，自签证书可以参考
+https://learn.microsoft.com/zh-cn/azure/application-gateway/self-signed-certificates
 
 根证书 ca.crt 服务器证书 server.crt 服务器密钥 server.key
 
-至少需要生成一个 server.pem，客户端可以同样使用此证书用于双端认证；或者生成两个证书，一个 client，一个 server，用于双端认证
+至少需要生成一个
+server.pem，客户端可以同样使用此证书用于双端认证；或者生成两个证书，一个
+client，一个 server，用于双端认证
 
-需准备 fullchain.crt 用于认证（ cat server.crt ca.crt > fullchain.crt ），server.pem （ cat server.crt server.key ca.crt > server.pem ）用于解密
+需准备 fullchain.crt 用于认证（ cat server.crt ca.crt > fullchain.crt
+），server.pem （ cat server.crt server.key ca.crt > server.pem ）用于解密
 
 ### haproxy_client 配置
 

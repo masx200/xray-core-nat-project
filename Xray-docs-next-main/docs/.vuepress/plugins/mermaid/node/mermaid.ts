@@ -16,7 +16,8 @@ export const getMermaidContent = ({
   diagram = "mermaid",
   content,
   title = "",
-}: MermaidOptions): string => `\
+}: MermaidOptions): string =>
+  `\
 ${
   title
     ? `\
@@ -45,7 +46,9 @@ ${
 `;
 
 const getMermaid = (options: MermaidOptions, index: number): string =>
-  `<Mermaid id="mermaid-${index}" code="${encodeURI(getMermaidContent(options))}"${options.title ? ` title="${encodeURI(options.title)}"` : ""}></Mermaid>`;
+  `<Mermaid id="mermaid-${index}" code="${encodeURI(
+    getMermaidContent(options),
+  )}"${options.title ? ` title="${encodeURI(options.title)}"` : ""}></Mermaid>`;
 
 export const MermaidPlugin: PluginSimple = (md) => {
   // Handle ```mermaid blocks

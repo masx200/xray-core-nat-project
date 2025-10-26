@@ -2,7 +2,8 @@
 
 ## Architecture Overview
 
-This document provides the technical design details for implementing bidirectional NAT functionality in Xray-core.
+This document provides the technical design details for implementing
+bidirectional NAT functionality in Xray-core.
 
 ## System Architecture
 
@@ -75,6 +76,7 @@ This document provides the technical design details for implementing bidirection
 ### Outbound Flow (Site A → Site B)
 
 1. **Connection Initiation**
+
    ```
    Device C: 192.168.1.20:12345 → 240.2.2.20:80
                 │
@@ -100,6 +102,7 @@ This document provides the technical design details for implementing bidirection
    ```
 
 2. **NAT Transformation Details**
+
    ```
    Original:   Src: 192.168.1.20:12345 → Dst: 240.2.2.20:80
    DNAT Applied: Src: 192.168.1.20:12345 → Dst: 192.168.1.20:80
@@ -119,6 +122,7 @@ This document provides the technical design details for implementing bidirection
 ### Return Flow (Site B → Site A)
 
 1. **Response Processing**
+
    ```
    Device D: 192.168.1.20:80 → 192.168.1.1:12345
                 │
@@ -144,6 +148,7 @@ This document provides the technical design details for implementing bidirection
    ```
 
 2. **SNAT Transformation Details**
+
    ```
    Original:   Src: 192.168.1.20:80 → Dst: 192.168.1.1:12345
    SNAT Applied: Src: 240.2.2.20:80 → Dst: 192.168.1.20:12345
@@ -321,6 +326,7 @@ message TrafficStats {
 ### Key Algorithms
 
 #### 1. Session Lookup Algorithm
+
 ```go
 func (n *NATHandler) FindSession(packet Packet) (*NATSession, error) {
     // Create lookup key based on packet characteristics
@@ -343,6 +349,7 @@ func (n *NATHandler) FindSession(packet Packet) (*NATSession, error) {
 ```
 
 #### 2. DNAT Transformation Algorithm
+
 ```go
 func (n *NATHandler) ApplyDNAT(packet Packet, rule NATRule) (*Packet, error) {
     // Validate packet matches rule criteria
@@ -373,6 +380,7 @@ func (n *NATHandler) ApplyDNAT(packet Packet, rule NATRule) (*Packet, error) {
 ```
 
 #### 3. SNAT Transformation Algorithm
+
 ```go
 func (n *NATHandler) ApplySNAT(packet Packet, session *NATSession) (*Packet, error) {
     // Verify this packet belongs to an existing session
@@ -395,15 +403,20 @@ func (n *NATHandler) ApplySNAT(packet Packet, session *NATSession) (*Packet, err
 ### Performance Optimization Strategies
 
 #### 1. Session Table Design
+
 - **Concurrent Maps**: Use sync.Map for thread-safe session storage
 - **LRU Cache**: Implement size-based eviction to prevent memory exhaustion
 - **Index Structures**: Secondary indexes for source/destination lookups
 
 #### 2. Connection Pooling
-- **TCP Connection Reuse**: Maintain persistent connections to frequently accessed destinations
-- **UDP Session Batching**: Group UDP packets with same destination to reduce overhead
+
+- **TCP Connection Reuse**: Maintain persistent connections to frequently
+  accessed destinations
+- **UDP Session Batching**: Group UDP packets with same destination to reduce
+  overhead
 
 #### 3. Memory Management
+
 - **Object Pooling**: Reuse packet and session structures to reduce GC pressure
 - **Compact Storage**: Use efficient data structures for session storage
 
@@ -446,24 +459,28 @@ func (n *NATHandler) ApplySNAT(packet Packet, session *NATSession) (*Packet, err
 ## Testing Strategy
 
 ### Unit Tests
+
 - Session table operations
 - NAT transformation logic
 - Rule matching algorithms
 - Error handling scenarios
 
 ### Integration Tests
+
 - End-to-end connectivity
 - Bidirectional traffic flow
 - Session persistence
 - Resource limit enforcement
 
 ### Performance Tests
+
 - Concurrent connection handling
 - Memory usage under load
 - Latency impact measurement
 - Session cleanup efficiency
 
 ### Security Tests
+
 - Session isolation between sites
 - Address spoofing prevention
 - Resource exhaustion protection
@@ -472,16 +489,19 @@ func (n *NATHandler) ApplySNAT(packet Packet, session *NATSession) (*Packet, err
 ## Future Extensibility
 
 ### 1. Multi-Site Support
+
 - Hierarchical NAT topology
 - Site-to-site routing policies
 - Load balancing across multiple NAT gateways
 
 ### 2. Dynamic NAT
+
 - DHCP integration for virtual IP allocation
 - Dynamic port allocation
 - NAT444 support
 
 ### 3. Advanced Features
+
 - NAT logging and auditing
 - Session persistence across failover
 - Integration with SDN controllers
