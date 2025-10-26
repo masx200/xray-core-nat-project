@@ -177,7 +177,7 @@ func (h *Handler) shouldApplyNAT(ctx context.Context, destination xnet.Destinati
 func (h *Handler) matchesVirtualDestination(destination xnet.Destination, virtualNetwork string) bool {
 	destStr := destination.Address.String()
 
-	// Handle IPv6 addresses with embedded IPv4 (like 64:FF9B:1111::192.168.1.1)
+	// Handle IPv6 addresses with embedded IPv4 (like [prefix]::192.168.1.1)
 	if strings.Contains(virtualNetwork, ":") && strings.Contains(virtualNetwork, ".") {
 		return h.matchesIPv6EmbeddedIPv4(destination, virtualNetwork)
 	}
@@ -242,8 +242,8 @@ func (h *Handler) matchesIPv6EmbeddedIPv4Range(destination xnet.Destination, ipv
 	// Check if the destination address starts with the expected IPv6 prefix
 	// Handle both compressed and uncompressed formats
 	if !strings.HasPrefix(strings.ToLower(destStr), strings.ToLower(prefixWithoutCIDR)) {
-		// For compressed format, we need to be more flexible
-		if !strings.Contains(destStr, "64:ff9b:1111::") {
+		// For compressed format, check if the address contains the prefix
+		if !strings.Contains(strings.ToLower(destStr), strings.ToLower(prefixWithoutCIDR)) {
 			return false
 		}
 	}
@@ -262,7 +262,7 @@ func (h *Handler) matchesIPv6EmbeddedIPv4Range(destination xnet.Destination, ipv
 
 // extractIPv4FromIPv6 extracts IPv4 address from IPv6 embedded notation
 func (h *Handler) extractIPv4FromIPv6(ipv6Addr string) string {
-	// Handle format like 64:FF9B:1111::192.168.1.1
+	// Handle format like [prefix]::192.168.1.1
 	if strings.Contains(ipv6Addr, ":") && strings.Contains(ipv6Addr, ".") {
 		parts := strings.Split(ipv6Addr, ":")
 		for _, part := range parts {
@@ -272,7 +272,7 @@ func (h *Handler) extractIPv4FromIPv6(ipv6Addr string) string {
 		}
 	}
 
-	// Handle compressed IPv6 format like [64:ff9b:1111::c0a8:164]
+	// Handle compressed IPv6 format like [prefix]::c0a8:164
 	if strings.HasPrefix(ipv6Addr, "[") && strings.HasSuffix(ipv6Addr, "]") {
 		ipv6Addr = strings.Trim(ipv6Addr, "[]")
 	}

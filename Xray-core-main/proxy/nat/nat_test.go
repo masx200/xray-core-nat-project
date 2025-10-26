@@ -338,6 +338,108 @@ func TestIPv6EmbeddedIPv4NAT(t *testing.T) {
 	handler.Close()
 }
 
+// TestIPv6EmbeddedIPv4NAT_NewPrefix tests IPv6 to IPv4 NAT translation with a custom NAT64 prefix (64:FF9B:9876::)
+func TestIPv6EmbeddedIPv4NAT_NewPrefix(t *testing.T) {
+	config := &Config{
+		SiteId:    "test-ipv6-new-prefix",
+		UserLevel: 0,
+		EnableTcp: true,
+		EnableUdp: true,
+		VirtualRanges: []*VirtualIPRange{
+			{
+				VirtualNetwork:      "64:FF9B:9876::192.168.1.1/120",
+				RealNetwork:         "192.168.1.0/24",
+				Ipv6Enabled:         true,
+				Ipv6VirtualPrefix:   "64:FF9B:9876::192.168.1.1/120",
+			},
+		},
+		SessionTimeout: &SessionTimeout{
+			TcpTimeout:      300,
+			UdpTimeout:      60,
+			CleanupInterval: 30,
+		},
+		Limits: &ResourceLimits{
+			MaxSessions:     10000,
+			MaxMemoryMb:     100,
+			CleanupThreshold: 0.8,
+		},
+	}
+
+	handler := &Handler{
+		config:        config,
+		sessionTable:  &sync.Map{},
+		cleanupTicker: time.NewTicker(30 * time.Second),
+		done:          make(chan struct{}),
+	}
+
+	// Test IPv6 embedded IPv4 addresses with new prefix
+	testCases := []struct {
+		name     string
+		ipv6Dest string
+		expect   bool
+	}{
+		{
+			name:     "IPv6 embedded IPv4 with new prefix - first address",
+			ipv6Dest: "64:FF9B:9876::192.168.1.1",
+			expect:   true,
+		},
+		{
+			name:     "IPv6 embedded IPv4 with new prefix - middle address",
+			ipv6Dest: "64:FF9B:9876::192.168.1.100",
+			expect:   true,
+		},
+		{
+			name:     "IPv6 embedded IPv4 with new prefix - last address in /120",
+			ipv6Dest: "64:FF9B:9876::192.168.1.255",
+			expect:   true,
+		},
+		{
+			name:     "IPv6 embedded IPv4 with new prefix - out of range",
+			ipv6Dest: "64:FF9B:9876::192.168.2.1",
+			expect:   false,
+		},
+		{
+			name:     "IPv6 embedded IPv4 - old prefix should not match",
+			ipv6Dest: "64:FF9B:1111::192.168.1.1",
+			expect:   false,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			dest := xnet.Destination{
+				Address: xnet.ParseAddress(tc.ipv6Dest),
+				Network: xnet.Network_TCP,
+				Port:    80,
+			}
+
+			rule, shouldTransform := handler.shouldApplyNAT(context.Background(), dest)
+			if tc.expect && !shouldTransform {
+				t.Errorf("Expected NAT transformation for %s, but none was applied", tc.ipv6Dest)
+			}
+			if !tc.expect && shouldTransform {
+				t.Errorf("Expected no NAT transformation for %s, but one was applied", tc.ipv6Dest)
+			}
+
+			if shouldTransform {
+				// Test DNAT transformation
+				transformed, err := handler.applyDNAT(dest, rule)
+				if err != nil {
+					t.Fatalf("DNAT transformation failed for %s: %v", tc.ipv6Dest, err)
+				}
+
+				// Verify the transformation extracts IPv4 correctly
+				expectedIPv4 := tc.ipv6Dest[strings.LastIndex(tc.ipv6Dest, ":")+1:]
+				if transformed.Address.String() != expectedIPv4 {
+					t.Errorf("Expected transformed address %s, got %s", expectedIPv4, transformed.Address.String())
+				}
+			}
+		})
+	}
+
+	handler.Close()
+}
+
 func TestIPv6EmbeddedIPv4Extraction(t *testing.T) {
 	handler := &Handler{}
 
