@@ -7,6 +7,7 @@ Xray 支持以下出站协议：
 - [Freedom (fragment, noises)](../outbounds/freedom.md)
 - [HTTP](../outbounds/http.md)
 - [Loopback](../outbounds/loopback.md)
+- [NAT (Network Address Translation)](../outbounds/nat.md)
 - [Shadowsocks](../outbounds/shadowsocks.md)
 - [Socks](../outbounds/socks.md)
 - [Trojan](../outbounds/trojan.md)
