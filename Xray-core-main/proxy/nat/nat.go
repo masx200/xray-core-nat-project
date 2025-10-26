@@ -135,7 +135,7 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 	}
 
 	// Determine if this is virtual IP traffic that needs NAT transformation
-	natRule, shouldTransform := h.shouldApplyNAT(destination)
+	natRule, shouldTransform := h.shouldApplyNAT(ctx, destination)
 	if !shouldTransform {
 		// Not a virtual IP, handle as normal outbound
 		return h.handleNormalOutbound(ctx, link, destination, dialer)
@@ -146,10 +146,13 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 }
 
 // shouldApplyNAT determines if NAT transformation should be applied to destination
-func (h *Handler) shouldApplyNAT(destination xnet.Destination) (*NATRule, bool) {
+func (h *Handler) shouldApplyNAT(ctx context.Context, destination xnet.Destination) (*NATRule, bool) {
 	// First check specific rules
 	for _, rule := range h.config.Rules {
-		if h.matchesVirtualDestination(destination, rule.VirtualDestination) {
+		if h.matchesVirtualDestination(destination, rule.VirtualDestination) &&
+			h.matchesProtocol(destination, rule.Protocol) &&
+			h.matchesPort(destination, rule) &&
+			h.matchesSite(ctx, rule) {
 			return rule, true
 		}
 	}
@@ -357,6 +360,96 @@ func (h *Handler) matchesCIDR(ip, cidr string) bool {
 	return network.Contains(addr)
 }
 
+// matchesProtocol checks if destination protocol matches rule protocol specification
+func (h *Handler) matchesProtocol(destination xnet.Destination, protocol string) bool {
+	if protocol == "" {
+		// Empty protocol means match all protocols
+		return true
+	}
+
+	destProtocol := strings.ToLower(destination.Network.String())
+	ruleProtocols := strings.Split(strings.ToLower(protocol), ",")
+
+	for _, ruleProtocol := range ruleProtocols {
+		ruleProtocol = strings.TrimSpace(ruleProtocol)
+		if ruleProtocol == destProtocol || ruleProtocol == "tcp,udp" || ruleProtocol == "udp,tcp" {
+			return true
+		}
+	}
+
+	return false
+}
+
+// matchesPort checks if destination port matches rule port mapping
+func (h *Handler) matchesPort(destination xnet.Destination, rule *NATRule) bool {
+	if rule.PortMapping == nil {
+		// No port mapping specified, match all ports
+		return true
+	}
+
+	// For now, we match all ports when port mapping is specified
+	// Port mapping logic will be applied during transformation
+	return true
+}
+
+// mapPort maps the original port to the translated port based on port mapping configuration
+func (h *Handler) mapPort(originalPort xnet.Port, portMapping *PortMapping) xnet.Port {
+	if portMapping == nil {
+		return originalPort
+	}
+
+	// If original port is specified, check if it matches
+	if portMapping.OriginalPort != "" && portMapping.OriginalPort != "any" {
+		// Parse the specified original port
+		specifiedPorts := strings.Split(portMapping.OriginalPort, "-")
+		if len(specifiedPorts) == 1 {
+			// Single port
+			if specifiedPort, err := xnet.PortFromString(specifiedPorts[0]); err == nil {
+				if specifiedPort.Value() != originalPort.Value() {
+					// Original port doesn't match, no mapping
+					return originalPort
+				}
+			}
+		}
+	}
+
+	// Map to translated port
+	if portMapping.TranslatedPort != "" {
+		if translatedPort, err := xnet.PortFromString(portMapping.TranslatedPort); err == nil {
+			return translatedPort
+		}
+	}
+
+	return originalPort
+}
+
+// matchesSite checks if the rule's source site matches the current site context
+func (h *Handler) matchesSite(ctx context.Context, rule *NATRule) bool {
+	if rule.SourceSite == "" {
+		// Empty source site means match all sites
+		return true
+	}
+
+	// Get the current site ID from configuration
+	currentSite := h.config.SiteId
+	if currentSite == "" {
+		// No site ID configured, match all rules
+		return true
+	}
+
+	// Check if the rule's source site matches the current site
+	// Support for multiple sites separated by comma
+	sites := strings.Split(strings.ToLower(rule.SourceSite), ",")
+	for _, site := range sites {
+		site = strings.TrimSpace(site)
+		if strings.ToLower(site) == strings.ToLower(currentSite) {
+			return true
+		}
+	}
+
+	return false
+}
+
 // handleNormalOutbound handles non-NAT outbound traffic
 func (h *Handler) handleNormalOutbound(ctx context.Context, link *transport.Link, destination xnet.Destination, dialer internet.Dialer) error {
 	// Implement standard outbound connection
@@ -476,7 +569,7 @@ func (h *Handler) applyDNAT(destination xnet.Destination, rule *NATRule) (xnet.D
 
 	// Apply port mapping if specified
 	if rule.PortMapping != nil {
-		// TODO: Implement port mapping logic
+		transformed.Port = h.mapPort(destination.Port, rule.PortMapping)
 	}
 
 	return transformed, nil

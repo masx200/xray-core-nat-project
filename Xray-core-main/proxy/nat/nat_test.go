@@ -1,6 +1,7 @@
 package nat
 
 import (
+	"context"
 	"strings"
 	"sync"
 	"testing"
@@ -135,7 +136,7 @@ func TestShouldApplyNAT(t *testing.T) {
 		Port:    80,
 	}
 
-	rule, shouldTransform := handler.shouldApplyNAT(dest)
+	rule, shouldTransform := handler.shouldApplyNAT(context.Background(), dest)
 	if !shouldTransform {
 		t.Error("Expected NAT transformation for virtual IP destination")
 	}
@@ -155,7 +156,7 @@ func TestShouldApplyNAT(t *testing.T) {
 		Port:    53,
 	}
 
-	_, shouldTransform = handler.shouldApplyNAT(normalDest)
+	_, shouldTransform = handler.shouldApplyNAT(context.Background(), normalDest)
 	if shouldTransform {
 		t.Error("Should not apply NAT transformation for non-virtual IP")
 	}
@@ -310,7 +311,7 @@ func TestIPv6EmbeddedIPv4NAT(t *testing.T) {
 				Port:    80,
 			}
 
-			rule, shouldTransform := handler.shouldApplyNAT(dest)
+			rule, shouldTransform := handler.shouldApplyNAT(context.Background(), dest)
 			if tc.expect && !shouldTransform {
 				t.Errorf("Expected NAT transformation for %s, but none was applied", tc.ipv6Dest)
 			}
@@ -424,4 +425,132 @@ func TestIPv6NATSessionCreation(t *testing.T) {
 	// Clean up
 	handler.removeSession(session.SessionID)
 	handler.Close()
+}
+
+func TestSiteBasedRuleSelection(t *testing.T) {
+	config := &Config{
+		SiteId: "site-b",
+		Rules: []*NATRule{
+			{
+				RuleId:            "rule-site-a",
+				VirtualDestination: "240.1.1.20",
+				RealDestination:    "192.168.1.20",
+				Protocol:          "tcp",
+				SourceSite:        "site-a",
+			},
+			{
+				RuleId:            "rule-site-b",
+				VirtualDestination: "240.2.2.20",
+				RealDestination:    "192.168.2.20",
+				Protocol:          "tcp",
+				SourceSite:        "site-b",
+			},
+			{
+				RuleId:            "rule-both-sites",
+				VirtualDestination: "240.3.3.20",
+				RealDestination:    "192.168.3.20",
+				Protocol:          "tcp",
+				SourceSite:        "site-a,site-b",
+			},
+			{
+				RuleId:            "rule-any-site",
+				VirtualDestination: "240.4.4.20",
+				RealDestination:    "192.168.4.20",
+				Protocol:          "tcp",
+				SourceSite:        "",
+			},
+		},
+	}
+
+	handler := &Handler{
+		config:       config,
+		sessionTable: &sync.Map{},
+	}
+
+	testCases := []struct {
+		name          string
+		virtualDest   string
+		expectRule    string
+		expectMatch   bool
+	}{
+		{
+			name:        "Site A rule - should not match for Site B handler",
+			virtualDest: "240.1.1.20",
+			expectMatch: false,
+		},
+		{
+			name:        "Site B rule - should match for Site B handler",
+			virtualDest: "240.2.2.20",
+			expectRule:  "rule-site-b",
+			expectMatch: true,
+		},
+		{
+			name:        "Both sites rule - should match for Site B handler",
+			virtualDest: "240.3.3.20",
+			expectRule:  "rule-both-sites",
+			expectMatch: true,
+		},
+		{
+			name:        "Any site rule - should match for Site B handler",
+			virtualDest: "240.4.4.20",
+			expectRule:  "rule-any-site",
+			expectMatch: true,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			dest := xnet.Destination{
+				Address: xnet.ParseAddress(tc.virtualDest),
+				Network: xnet.Network_TCP,
+				Port:    80,
+			}
+
+			rule, shouldTransform := handler.shouldApplyNAT(context.Background(), dest)
+			if tc.expectMatch && !shouldTransform {
+				t.Errorf("Expected NAT transformation for %s, but none was applied", tc.virtualDest)
+			}
+			if !tc.expectMatch && shouldTransform {
+				t.Errorf("Expected no NAT transformation for %s, but one was applied", tc.virtualDest)
+			}
+			if tc.expectMatch && rule.RuleId != tc.expectRule {
+				t.Errorf("Expected rule ID '%s', got '%s'", tc.expectRule, rule.RuleId)
+			}
+		})
+	}
+}
+
+func TestSiteBasedRuleSelection_NoSiteConfigured(t *testing.T) {
+	config := &Config{
+		SiteId: "", // No site configured
+		Rules: []*NATRule{
+			{
+				RuleId:            "rule-site-a",
+				VirtualDestination: "240.1.1.20",
+				RealDestination:    "192.168.1.20",
+				Protocol:          "tcp",
+				SourceSite:        "site-a",
+			},
+		},
+	}
+
+	handler := &Handler{
+		config:       config,
+		sessionTable: &sync.Map{},
+	}
+
+	dest := xnet.Destination{
+		Address: xnet.ParseAddress("240.1.1.20"),
+		Network: xnet.Network_TCP,
+		Port:    80,
+	}
+
+	// When no site is configured, all rules should match
+	rule, shouldTransform := handler.shouldApplyNAT(context.Background(), dest)
+	if !shouldTransform {
+		t.Error("Expected NAT transformation when no site is configured")
+	}
+	if rule.RuleId != "rule-site-a" {
+		t.Errorf("Expected rule ID 'rule-site-a', got '%s'", rule.RuleId)
+	}
 }
