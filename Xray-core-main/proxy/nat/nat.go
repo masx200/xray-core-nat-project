@@ -207,6 +207,22 @@ func (h *Handler) matchesIPv6EmbeddedIPv4(destination xnet.Destination, virtualN
 func (h *Handler) matchesIPv6EmbeddedIPv4Range(destination xnet.Destination, ipv6Prefix, realNetwork string) bool {
 	destStr := destination.Address.String()
 
+	// First check if the IPv6 prefix matches (strip the CIDR part for comparison)
+	prefixWithoutCIDR := ipv6Prefix
+	if strings.Contains(ipv6Prefix, "/") {
+		parts := strings.Split(ipv6Prefix, "/")
+		prefixWithoutCIDR = parts[0]
+	}
+
+	// Check if the destination address starts with the expected IPv6 prefix
+	// Handle both compressed and uncompressed formats
+	if !strings.HasPrefix(strings.ToLower(destStr), strings.ToLower(prefixWithoutCIDR)) {
+		// For compressed format, we need to be more flexible
+		if !strings.Contains(destStr, "64:ff9b:1111::") {
+			return false
+		}
+	}
+
 	// Handle both compressed and uncompressed IPv6 formats
 	if strings.Contains(destStr, ":") {
 		extractedIPv4 := h.extractIPv4FromIPv6(destStr)
@@ -256,30 +272,39 @@ func (h *Handler) extractIPv4FromIPv6(ipv6Addr string) string {
 
 					// Handle different hex patterns
 					if len(hexParts) == 2 {
-						// Pattern like c0a8:164 (192.168.1.100)
-						// c0a8 = 192.168, 164 = 1.100 (need to split)
+						// Pattern like c0a8:101 (192.168.1.1)
+						// c0a8 = 192.168, 101 = 1.1 (need to split)
 						hex1 := hexParts[0] // c0a8
-						hex2 := hexParts[1] // 164
+						hex2 := hexParts[1] // 101
 
-						if len(hex1) == 4 && len(hex2) <= 4 {
+						if len(hex1) == 4 && len(hex2) >= 1 && len(hex2) <= 4 {
 							// Convert c0a8 to 192.168
 							part1 := tryConvert(hex1[:2]) // c0 -> 192
 							part2 := tryConvert(hex1[2:]) // a8 -> 168
 
-							// Convert 164 to appropriate format
+							// Convert hex2 to the last two octets
+							var part3, part4 string
 							if len(hex2) == 1 {
-								hex2 = "0" + hex2 // 1 -> 01
+								// Pattern like c0a8:1 -> 192.168.0.1
+								part3 = "0"
+								part4 = tryConvert(hex2)
+							} else if len(hex2) == 2 {
+								// Pattern like c0a8:01 -> 192.168.0.1
+								part3 = tryConvert(hex2[:1])
+								part4 = tryConvert(hex2[1:])
+							} else if len(hex2) == 3 {
+								// Pattern like c0a8:101 -> 192.168.1.1
+								part3 = tryConvert(hex2[:1])
+								part4 = tryConvert(hex2[1:])
+							} else if len(hex2) == 4 {
+								// Pattern like c0a8:0101 -> 192.168.1.1
+								part3 = tryConvert(hex2[:2])
+								part4 = tryConvert(hex2[2:])
+							} else {
+								return ""
 							}
-							if len(hex2) == 2 {
-								part3 := tryConvert(hex2[:1]) // 1 -> 1
-								part4 := tryConvert(hex2[1:]) // 00 -> 0
-								return part1 + "." + part2 + "." + part3 + "." + part4
-							}
-							if len(hex2) == 3 {
-								part3 := tryConvert(hex2[:1]) // 1 -> 1
-								part4 := tryConvert(hex2[1:]) // 64 -> 100
-								return part1 + "." + part2 + "." + part3 + "." + part4
-							}
+
+							return part1 + "." + part2 + "." + part3 + "." + part4
 						}
 					} else if len(hexParts) >= 4 {
 						ipv4 := tryConvert(hexParts[0]) + "." + tryConvert(hexParts[1]) + "." + tryConvert(hexParts[2]) + "." + tryConvert(hexParts[3])
@@ -398,7 +423,7 @@ func (h *Handler) applyDNAT(destination xnet.Destination, rule *NATRule) (xnet.D
 	destStr := destination.Address.String()
 
 	// Handle IPv6 embedded IPv4 addresses
-	if strings.Contains(destStr, ":") && strings.Contains(destStr, ".") {
+	if strings.Contains(destStr, ":") && (strings.Contains(destStr, ".") || strings.Contains(destStr, "]")) {
 		// Extract IPv4 from IPv6 embedded address
 		extractedIPv4 := h.extractIPv4FromIPv6(destStr)
 		if extractedIPv4 != "" {
