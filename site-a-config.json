@@ -87,6 +87,18 @@
       }
     },
     {
+      "tag": "socks-to-site-b",
+      "protocol": "socks",
+      "settings": {
+        "servers": [
+          {
+            "address": "10.20.20.20",
+            "port": 10808
+          }
+        ]
+      }
+    },
+    {
       "tag": "direct",
       "protocol": "freedom",
       "settings": {
@@ -115,7 +127,7 @@
       {
         "type": "field",
         "ip": ["240.2.2.0/24", "64:FF9B:2222::/96"],
-        "outboundTag": "nat-outbound"
+        "outboundTag": "socks-to-site-b"
       },
       {
         "type": "field",
