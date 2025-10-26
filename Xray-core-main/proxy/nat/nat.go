@@ -4,6 +4,7 @@ package nat
 //go:generate go run github.com/xtls/xray-core/common/proto -cproto=./config.proto -pnat -g
 
 import (
+	"container/list"
 	"context"
 	"fmt"
 	"net"
@@ -49,6 +50,13 @@ type Handler struct {
 	cleanupTicker  *time.Ticker
 	done          chan struct{}
 
+	// LRU and memory management
+	lruList       *list.List // Doubly-linked list for LRU tracking
+	lruMap        map[string]*list.Element // Map for O(1) LRU access
+	lruLock       sync.RWMutex
+	maxSessions   int64
+	maxMemoryMB   int64
+
 	// Metrics and statistics
 	activeSessions int64
 	totalSessions  int64
@@ -73,8 +81,12 @@ type NATSession struct {
 func New() *Handler {
 	return &Handler{
 		sessionTable:   &sync.Map{},
+		lruList:        list.New(),
+		lruMap:         make(map[string]*list.Element),
 		cleanupTicker:  time.NewTicker(30 * time.Second),
 		done:          make(chan struct{}),
+		maxSessions:   10000, // Default max sessions
+		maxMemoryMB:   100,   // Default max memory in MB
 	}
 }
 
@@ -86,6 +98,16 @@ func (h *Handler) Init(config *Config, pm policy.Manager) error {
 
 	h.config = config
 	h.policyManager = pm
+
+	// Configure limits from config
+	if config.Limits != nil {
+		if config.Limits.MaxSessions > 0 {
+			h.maxSessions = int64(config.Limits.MaxSessions)
+		}
+		if config.Limits.MaxMemoryMb > 0 {
+			h.maxMemoryMB = int64(config.Limits.MaxMemoryMb)
+		}
+	}
 
 	// Only start cleanup routine if not already running
 	if h.cleanupTicker != nil {
@@ -474,7 +496,24 @@ func (h *Handler) createNATSession(virtualDest, realDest xnet.Destination, direc
 		Direction:     direction,
 	}
 
+	// Check memory limits and evict if necessary
+	h.enforceMemoryLimits()
+
+	// Check session limits and evict LRU if necessary
+	h.enforceSessionLimits()
+
 	h.sessionTable.Store(sessionID, session)
+
+	// Add to LRU tracking
+	h.lruLock.Lock()
+	if elem, exists := h.lruMap[sessionID]; exists {
+		h.lruList.MoveToFront(elem)
+	} else {
+		elem := h.lruList.PushFront(sessionID)
+		h.lruMap[sessionID] = elem
+	}
+	h.lruLock.Unlock()
+
 	h.totalSessions++
 	h.activeSessions++
 
@@ -485,6 +524,49 @@ func (h *Handler) createNATSession(virtualDest, realDest xnet.Destination, direc
 func (h *Handler) removeSession(sessionID string) {
 	if _, loaded := h.sessionTable.LoadAndDelete(sessionID); loaded {
 		h.activeSessions--
+
+		// Remove from LRU tracking
+		h.lruLock.Lock()
+		if elem, exists := h.lruMap[sessionID]; exists {
+			h.lruList.Remove(elem)
+			delete(h.lruMap, sessionID)
+		}
+		h.lruLock.Unlock()
+	}
+}
+
+// enforceSessionLimits enforces session count limits by evicting least recently used sessions
+func (h *Handler) enforceSessionLimits() {
+	h.lruLock.Lock()
+	defer h.lruLock.Unlock()
+
+	// Evict LRU sessions until we're under the limit
+	for h.activeSessions >= h.maxSessions && h.lruList.Len() > 0 {
+		// Get the least recently used session (back of the list)
+		if elem := h.lruList.Back(); elem != nil {
+			sessionID := elem.Value.(string)
+			h.lruList.Remove(elem)
+			delete(h.lruMap, sessionID)
+			h.sessionTable.Delete(sessionID)
+			h.activeSessions--
+		}
+	}
+}
+
+// enforceMemoryLimits enforces memory limits by estimating session memory usage
+func (h *Handler) enforceMemoryLimits() {
+	// Estimate memory usage per session (rough estimate in bytes)
+	const sessionMemoryEstimate = 2048 // 2KB per session
+	maxSessionsFromMemory := (h.maxMemoryMB * 1024 * 1024) / sessionMemoryEstimate
+
+	// If session count would exceed memory limits, enforce it
+	if maxSessionsFromMemory < h.maxSessions {
+		h.maxSessions = maxSessionsFromMemory
+
+		// Log the adjustment (in production, this would use the logging system)
+		if h.activeSessions >= h.maxSessions {
+			h.enforceSessionLimits()
+		}
 	}
 }
 
@@ -512,15 +594,20 @@ func (h *Handler) cleanupExpiredSessions() {
 		timeout = 300 * time.Second // Default 5 minutes
 	}
 
+	var expiredSessions []string
 	h.sessionTable.Range(func(key, value interface{}) bool {
 		if session, ok := value.(*NATSession); ok {
 			if now.Sub(session.LastActivity) > timeout {
-				h.sessionTable.Delete(key)
-				h.activeSessions--
+				expiredSessions = append(expiredSessions, key.(string))
 			}
 		}
 		return true
 	})
+
+	// Clean up expired sessions from both tables
+	for _, sessionID := range expiredSessions {
+		h.removeSession(sessionID)
+	}
 }
 
 

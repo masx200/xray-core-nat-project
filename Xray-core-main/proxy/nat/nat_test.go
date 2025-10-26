@@ -59,11 +59,7 @@ func TestHandler_Init(t *testing.T) {
 }
 
 func TestNATSession_Lifecycle(t *testing.T) {
-	handler := &Handler{
-		sessionTable:   &sync.Map{},
-		cleanupTicker:  time.NewTicker(30 * time.Second),
-		done:          make(chan struct{}),
-	}
+	handler := New()
 	if handler == nil {
 		t.Fatal("Failed to create NAT handler")
 	}
@@ -207,12 +203,8 @@ func TestSessionCleanup(t *testing.T) {
 		},
 	}
 
-	handler := &Handler{
-		config:        config,
-		sessionTable:  &sync.Map{},
-		cleanupTicker: time.NewTicker(30 * time.Second),
-		done:          make(chan struct{}),
-	}
+	handler := New()
+	handler.config = config
 
 	// Create a session
 	virtualDest := xnet.Destination{
@@ -393,11 +385,7 @@ func TestIPv6EmbeddedIPv4Extraction(t *testing.T) {
 }
 
 func TestIPv6NATSessionCreation(t *testing.T) {
-	handler := &Handler{
-		sessionTable:  &sync.Map{},
-		cleanupTicker: time.NewTicker(30 * time.Second),
-		done:          make(chan struct{}),
-	}
+	handler := New()
 
 	// Create IPv6 embedded IPv4 destination
 	ipv6Dest := xnet.Destination{
