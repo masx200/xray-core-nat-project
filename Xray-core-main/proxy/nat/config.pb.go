@@ -37,7 +37,9 @@ type Config struct {
 	// Session timeout configuration
 	SessionTimeout *SessionTimeout `protobuf:"bytes,7,opt,name=session_timeout,json=sessionTimeout,proto3" json:"session_timeout,omitempty"`
 	// Performance and memory limits
-	Limits        *ResourceLimits `protobuf:"bytes,8,opt,name=limits,proto3" json:"limits,omitempty"`
+	Limits *ResourceLimits `protobuf:"bytes,8,opt,name=limits,proto3" json:"limits,omitempty"`
+	// NAT64 prefix (e.g., "64:FF9B::/96" or "64:FF9B:1111::")
+	Nat64Prefix   string `protobuf:"bytes,9,opt,name=nat64_prefix,json=nat64Prefix,proto3" json:"nat64_prefix,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -126,6 +128,13 @@ func (x *Config) GetLimits() *ResourceLimits {
 		return x.Limits
 	}
 	return nil
+}
+
+func (x *Config) GetNat64Prefix() string {
+	if x != nil {
+		return x.Nat64Prefix
+	}
+	return ""
 }
 
 type VirtualIPRange struct {
@@ -474,7 +483,7 @@ var File_config_proto protoreflect.FileDescriptor
 
 const file_config_proto_rawDesc = "" +
 	"\n" +
-	"\fconfig.proto\x12\x0exray.proxy.nat\"\xf5\x02\n" +
+	"\fconfig.proto\x12\x0exray.proxy.nat\"\x98\x03\n" +
 	"\x06Config\x12\x17\n" +
 	"\asite_id\x18\x01 \x01(\tR\x06siteId\x12\x1d\n" +
 	"\n" +
@@ -486,7 +495,8 @@ const file_config_proto_rawDesc = "" +
 	"\x0evirtual_ranges\x18\x05 \x03(\v2\x1e.xray.proxy.nat.VirtualIPRangeR\rvirtualRanges\x12-\n" +
 	"\x05rules\x18\x06 \x03(\v2\x17.xray.proxy.nat.NATRuleR\x05rules\x12G\n" +
 	"\x0fsession_timeout\x18\a \x01(\v2\x1e.xray.proxy.nat.SessionTimeoutR\x0esessionTimeout\x126\n" +
-	"\x06limits\x18\b \x01(\v2\x1e.xray.proxy.nat.ResourceLimitsR\x06limits\"\xaf\x01\n" +
+	"\x06limits\x18\b \x01(\v2\x1e.xray.proxy.nat.ResourceLimitsR\x06limits\x12!\n" +
+	"\fnat64_prefix\x18\t \x01(\tR\vnat64Prefix\"\xaf\x01\n" +
 	"\x0eVirtualIPRange\x12'\n" +
 	"\x0fvirtual_network\x18\x01 \x01(\tR\x0evirtualNetwork\x12!\n" +
 	"\freal_network\x18\x02 \x01(\tR\vrealNetwork\x12!\n" +
