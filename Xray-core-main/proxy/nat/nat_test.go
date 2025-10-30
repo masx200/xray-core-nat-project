@@ -648,3 +648,83 @@ func TestSiteBasedRuleSelection_NoSiteConfigured(t *testing.T) {
 		t.Errorf("Expected rule ID 'rule-site-a', got '%s'", rule.RuleId)
 	}
 }
+
+func TestCustomNAT64Prefix(t *testing.T) {
+	handler := New()
+
+	// Create NAT config with custom NAT64 prefix
+	customNAT64Prefix := "64:FF9B:CAFE::"
+	config := &Config{
+		SiteId:      "test-site",
+		Nat64Prefix: customNAT64Prefix,
+		VirtualRanges: []*VirtualIPRange{
+			{
+				VirtualNetwork:      customNAT64Prefix + "192.168.1.1/120",
+				RealNetwork:         "192.168.1.0/24",
+				Ipv6Enabled:         true,
+				Ipv6VirtualPrefix:   customNAT64Prefix + "192.168.1.1/120",
+			},
+		},
+	}
+
+	handler.Init(config, nil)
+
+	// Test that getNAT64Prefix returns custom prefix
+	actualPrefix := handler.getNAT64Prefix()
+	if actualPrefix != customNAT64Prefix {
+		t.Errorf("Expected NAT64 prefix %s, got %s", customNAT64Prefix, actualPrefix)
+	}
+
+	// Test IPv6 embedded IPv4 matching with custom prefix
+	dest := xnet.Destination{
+		Address: xnet.ParseAddress(customNAT64Prefix + "192.168.1.100"),
+		Network: xnet.Network_TCP,
+		Port:    80,
+	}
+
+	rule, shouldTransform := handler.shouldApplyNAT(context.Background(), dest)
+	if !shouldTransform {
+		t.Errorf("Expected NAT transformation for %s with custom prefix, but none was applied", dest.Address.String())
+	}
+
+	if shouldTransform {
+		transformed, err := handler.applyDNAT(dest, rule)
+		if err != nil {
+			t.Fatalf("DNAT transformation failed for %s: %v", dest.Address.String(), err)
+		}
+
+		// Verify that transformation extracts IPv4 correctly
+		expectedIPv4 := "192.168.1.100"
+		if transformed.Address.String() != expectedIPv4 {
+			t.Errorf("Expected transformed address %s, got %s", expectedIPv4, transformed.Address.String())
+		}
+	}
+
+	handler.Close()
+}
+
+func TestDefaultNAT64PrefixFallback(t *testing.T) {
+	handler := New()
+
+	// Create NAT config without NAT64 prefix (should use default)
+	config := &Config{
+		SiteId: "",
+		VirtualRanges: []*VirtualIPRange{
+			{
+				VirtualNetwork: "240.1.1.0/24",
+				RealNetwork:    "192.168.1.0/24",
+			},
+		},
+	}
+
+	handler.Init(config, nil)
+
+	// Test that getNAT64Prefix returns default prefix
+	actualPrefix := handler.getNAT64Prefix()
+	expectedPrefix := "64:FF9B:1111::"
+	if actualPrefix != expectedPrefix {
+		t.Errorf("Expected default NAT64 prefix %s, got %s", expectedPrefix, actualPrefix)
+	}
+
+	handler.Close()
+}

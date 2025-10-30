@@ -117,6 +117,15 @@ func (h *Handler) Init(config *Config, pm policy.Manager) error {
 	return nil
 }
 
+// getNAT64Prefix returns the configured NAT64 prefix or the default
+func (h *Handler) getNAT64Prefix() string {
+	if h.config != nil && h.config.Nat64Prefix != "" {
+		return h.config.Nat64Prefix
+	}
+	// Default NAT64 prefix as fallback
+	return "64:FF9B:1111::"
+}
+
 // Type implements proxy.Outbound
 func (h *Handler) Type() interface{} {
 	return h.config
@@ -213,9 +222,11 @@ func (h *Handler) matchesIPv6EmbeddedIPv4(destination xnet.Destination, virtualN
 	if strings.Contains(destStr, ":") && strings.Contains(destStr, ".") {
 		extractedIPv4 := h.extractIPv4FromIPv6(destStr)
 		if extractedIPv4 != "" {
-			// Check if this matches the pattern
-			if strings.HasPrefix(virtualNetwork, "64:FF9B:1111::") {
-				virtualIPv4 := strings.Replace(virtualNetwork, "64:FF9B:1111::", "", 1)
+			// Get configured NAT64 prefix
+			nat64Prefix := h.getNAT64Prefix()
+			// Check if this matches the configured NAT64 prefix pattern
+			if strings.HasPrefix(virtualNetwork, nat64Prefix) {
+				virtualIPv4 := strings.Replace(virtualNetwork, nat64Prefix, "", 1)
 				if strings.Contains(virtualIPv4, "/") {
 					// Handle CIDR notation
 					return h.matchesCIDR(extractedIPv4, virtualIPv4)

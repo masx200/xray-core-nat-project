@@ -28,6 +28,9 @@ message Config {
 
   // Performance and memory limits
   ResourceLimits limits = 8;
+
+  // NAT64 prefix (e.g., "64:FF9B::/96" or "64:FF9B:1111::")
+  string nat64_prefix = 9;
 }
 
 message VirtualIPRange {
